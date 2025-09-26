@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - JobList</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(110deg, #3b82f6 0%, #6366f1 70%, #9333ea 100%);
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255,255,255,0.30);
+      border: 2px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22);
+    }
+    input, textarea {
+      border: 2px solid #a5b4fc;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px #c7d2fe;
+    }
+    button {
+      transition: box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(67,56,202,0.12);
+    }
+    button:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 16px rgba(99,102,241,0.18);
+    }
+    ::selection {
+      background: #a5b4fc;
+      color: #312e81;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="w-full max-w-sm glass rounded-2xl p-8 text-white shadow-2xl border border-purple-300/50 mx-auto mt-20">
+    <h2 class="text-3xl font-extrabold text-center mb-6 tracking-tight">Admin Login</h2>
+    <form id="login-form" class="space-y-4">
+      <input type="email" id="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-purple-400 border transition" required />
+      <input type="password" id="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-purple-400 border transition" required />
+      <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-800 text-white text-lg font-semibold hover:opacity-95 transition">Login</button>
+    </form>
+    <p id="login-error" class="text-red-300 text-sm mt-4 hidden"></p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden w-full min-h-screen flex flex-col">
+
+    <!-- Header Bar -->
+    <header class="flex items-center justify-between px-8 py-4 bg-white shadow-md border-b border-gray-200">
+      <h1 class="text-2xl font-bold text-indigo-800">JobList Admin Panel</h1>
+      <div class="flex items-center space-x-4">
+        <span class="text-gray-700 font-medium">Welcome, Admin</span>
+        <button onclick="logout()" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white shadow-inner border-r border-gray-200 p-6 flex flex-col space-y-4">
+        <button onclick="showSection('jobs')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-700 font-semibold hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          Jobs
+        </button>
+        <button onclick="showSection('add-job')" class="flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-700 font-semibold hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+          Add Job
+        </button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8 overflow-auto rounded-tr-2xl">
+
+        <!-- Jobs List -->
+        <section id="jobs-section" class="">
+          <h2 class="text-3xl font-extrabold text-indigo-800 mb-8 tracking-wide">All Job Listings</h2>
+          <div id="jobs-list" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </section>
+
+        <!-- Add Job -->
+        <section id="add-job-section" class="hidden max-w-lg">
+          <h2 class="text-3xl font-extrabold text-indigo-800 mb-8 tracking-wide">Add New Job</h2>
+          <form id="add-job-form" class="space-y-6">
+            <input type="text" id="job-title" placeholder="Job Title" class="w-full px-4 py-3 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
+            <input type="text" id="job-company" placeholder="Company Name" class="w-full px-4 py-3 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
+            <textarea id="job-description" placeholder="Job Description" rows="5" class="w-full px-4 py-3 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required></textarea>
+            <input type="text" id="job-location" placeholder="Location" class="w-full px-4 py-3 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
+            <input type="text" id="job-link" placeholder="Apply Link" class="w-full px-4 py-3 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
+            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-700 to-indigo-700 text-white font-bold hover:opacity-95 transition">Add Job</button>
+          </form>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
+      authDomain: "job-portal-a5287.firebaseapp.com",
+      projectId: "job-portal-a5287",
+      storageBucket: "job-portal-a5287.firebasestorage.app",
+      messagingSenderId: "662364695020",
+      appId: "1:662364695020:web:c609a35f35066c9d21b8c9",
+      measurementId: "G-NWGMC1TC1K"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginScreen = document.getElementById('login-screen');
+    const dashboard = document.getElementById('dashboard');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const jobsList = document.getElementById('jobs-list');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        loginError.textContent = "Invalid credentials. Try again.";
+        loginError.classList.remove("hidden");
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginScreen.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        showSection('jobs');
+        loadJobs();
+      } else {
+        loginScreen.classList.remove('hidden');
+        dashboard.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('add-job-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const job = {
+        title: document.getElementById('job-title').value,
+        company: document.getElementById('job-company').value,
+        description: document.getElementById('job-description').value,
+        location: document.getElementById('job-location').value,
+        applyLink: document.getElementById('job-link').value,
+      };
+      await addDoc(collection(db, "jobs"), job);
+      alert("Job added successfully!");
+      e.target.reset();
+      showSection('jobs');
+      loadJobs();
+    });
+
+    async function loadJobs() {
+      jobsList.innerHTML = '';
+      const querySnapshot = await getDocs(collection(db, "jobs"));
+      querySnapshot.forEach((docSnap) => {
+        const job = docSnap.data();
+        jobsList.innerHTML += `
+          <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col border border-indigo-200 hover:shadow-2xl transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">${job.title}</h3>
+            <p class="text-sm text-gray-600 mb-2">${job.company}</p>
+            <p class="text-gray-700 flex-grow mb-4">${job.description.slice(0, 100)}...</p>
+            <p class="text-sm text-indigo-600 mb-4">${job.location}</p>
+            <div class="flex justify-between items-center gap-4">
+              <a href="${job.applyLink}" target="_blank" class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-lg hover:bg-indigo-200 font-semibold">View</a>
+              <button onclick="deleteJob('${docSnap.id}')" class="bg-red-100 text-red-700 px-4 py-1 rounded-lg hover:bg-red-200 font-semibold">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    window.deleteJob = async (id) => {
+      await deleteDoc(doc(db, "jobs", id));
+      loadJobs();
+    };
+
+    window.showSection = (section) => {
+      document.getElementById('jobs-section').classList.add('hidden');
+      document.getElementById('add-job-section').classList.add('hidden');
+      document.getElementById(`${section}-section`).classList.remove('hidden');
+    };
+
+    window.logout = () => {
+      signOut(auth);
+    };
+  </script>
+</body>
+</html>
