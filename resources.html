@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Learning Resources - JobSearch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    .resource-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="text-3xl font-extrabold text-gray-800 tracking-tight">
+        Job<span class="text-blue-600">Search</span>
+      </a>
+      
+      <div class="flex items-center space-x-6">
+        <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition">
+            Back to Jobs
+        </a>
+        <a href="#" class="text-lg font-bold text-blue-600 hover:text-indigo-700 transition border-b-2 border-blue-600">
+            Resources
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container mx-auto px-6 py-16 flex-1">
+    <h1 class="text-5xl font-extrabold text-gray-900 text-center mb-4">
+        Essential Career Resources 💡
+    </h1>
+    <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+        Curated links and guides to help you land your dream job, from interview tips to learning roadmaps.
+    </p>
+    
+    <div id="resources-list" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        </div>
+  </main>
+
+  <footer class="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800">
+    <div class="container mx-auto px-6">
+      <p>&copy; 2025 JobSearch. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Your Firebase config - **Ensure this matches the config in admin.html and index.html**
+    const firebaseConfig = {
+      apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
+      authDomain: "job-portal-a5287.firebaseapp.com",
+      projectId: "job-portal-a5287",
+      storageBucket: "job-portal-a5287.firebasestorage.app",
+      messagingSenderId: "662364695020",
+      appId: "1:662364695020:web:c609a35f35066c9d21b8c9",
+      measurementId: "G-NWGMC1TC1K"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Sign in anonymously to allow public read access
+    signInAnonymously(auth).catch((error) => {
+      console.error('Auth error:', error);
+    });
+
+    const resourcesList = document.getElementById('resources-list');
+    const resourcesCollection = collection(db, "resources");
+    const resourcesQuery = query(resourcesCollection);
+
+    // Real-time listener to get all resources
+    onSnapshot(resourcesQuery, (snapshot) => {
+        if (snapshot.empty) {
+            resourcesList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No learning resources available at the moment. Check back later!</p>`;
+        } else {
+            displayResources(snapshot.docs.map(doc => doc.data()));
+        }
+    });
+
+    // Function to render resource cards to the page
+    const displayResources = (resourcesToDisplay) => {
+        resourcesList.innerHTML = '';
+        resourcesToDisplay.forEach(resource => {
+            resourcesList.innerHTML += `
+              <a href="${resource.link}" target="_blank" class="resource-card block bg-white rounded-3xl shadow-xl hover:shadow-2xl p-6 border border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13a2.003 2.003 0 100 3.999 2.003 2.003 0 000-3.999zM21 9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9m18 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0h-4.25a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75H21m0-3V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2" />
+                  </svg>
+                  <p class="ml-3 text-xl font-extrabold text-gray-900 leading-tight">${resource.name}</p>
+                </div>
+                <span class="w-full text-center bg-purple-100 text-purple-700 font-semibold py-2 px-4 rounded-lg hover:bg-purple-200 transition text-sm inline-block">
+                    Access Resource
+                </span>
+              </a>
+            `;
+        });
+    };
+  </script>
+</body>
+</html>

@@ -8,54 +8,114 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', sans-serif; }
+    /* Custom keyframes for fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 1.2s ease-out;
+    }
+    /* Modal specific styles */
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    .modal-container {
+      max-width: 640px;
+    }
+    .modal-content {
+      animation: modal-slide-up 0.3s ease-out forwards;
+    }
+    @keyframes modal-slide-up {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- Navbar -->
-  <header class="w-full bg-white/90 backdrop-blur-lg shadow-md sticky top-0 z-50">
+  <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
     <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="#" class="text-2xl sm:text-3xl font-extrabold text-gray-800">
-        Job<span class="text-blue-600">Link</span>
+      <a href="#" class="text-3xl font-extrabold text-gray-800 tracking-tight">
+        Job<span class="text-blue-600">Search</span>
       </a>
-      <!-- <a href="/admin" class="text-sm font-medium text-blue-600 hover:underline">Admin</a> -->
+      <a href="resources.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition">Resources</a>
     </nav>
   </header>
 
-  <!-- Hero Section -->
-  <section class="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-20 text-center">
-    <div class="container mx-auto px-6">
-      <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 animate-fadeIn">
+  <section class="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-24 text-center overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
+          <circle cx="5" cy="5" r="1.5" fill="rgba(255,255,255,0.2)" />
+        </pattern>
+        <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles)" />
+      </svg>
+    </div>
+    
+    <div class="container mx-auto px-6 relative z-10">
+      <h1 class="text-5xl sm:text-6xl font-extrabold mb-4 animate-fadeIn">
         Discover Your Dream Career
       </h1>
-      <p class="text-lg max-w-2xl mx-auto mb-8 opacity-90">
+      <p class="text-lg max-w-2xl mx-auto mb-10 opacity-90 leading-relaxed">
         Explore top job opportunities from trusted companies. Apply instantly with just one click.
       </p>
-      <div class="max-w-lg mx-auto flex bg-white rounded-full shadow-lg overflow-hidden">
-        <input type="text" placeholder="Search jobs, companies..." class="flex-grow px-4 py-3 text-gray-700 focus:outline-none" />
-        <button class="bg-blue-600 text-white px-6 font-semibold hover:bg-blue-700 transition">Search</button>
+      <div class="max-w-xl mx-auto flex bg-white rounded-full shadow-xl overflow-hidden p-1">
+        <input type="text" id="search-input" placeholder="Search for jobs, companies, or keywords..." class="flex-grow px-6 py-3 text-gray-800 bg-transparent placeholder-gray-400 focus:outline-none" />
+        <button id="search-button" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 shadow-md">
+          Search
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- Job Listings -->
-  <main class="container mx-auto px-6 py-12 flex-1">
-    <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Featured Jobs</h2>
-    <div id="job-listings" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- Job cards load here -->
-    </div>
+  <main class="container mx-auto px-6 py-16 flex-1">
+    <h2 class="text-4xl font-extrabold text-gray-900 text-center mb-12">Featured Jobs ✨</h2>
+    <div id="job-listings" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
-    <p>&copy; 2025 JobLink. All rights reserved.</p>
+  <footer class="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800">
+    <div class="container mx-auto px-6">
+      <p>&copy; 2025 JobSearch. All rights reserved.</p>
+    </div>
   </footer>
 
-  <!-- Firebase + Job Listing Script -->
+  <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-3xl shadow-xl p-8 w-full modal-container relative modal-content overflow-y-auto max-h-[90vh]">
+      <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="flex items-start mb-6">
+        <div id="modal-company-logo" class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-3xl rounded-xl shadow-lg"></div>
+        <div class="ml-6">
+          <h3 id="modal-title" class="text-3xl font-extrabold text-gray-900 mb-1"></h3>
+          <p id="modal-company" class="text-lg text-gray-600 mb-2"></p>
+          <div class="flex items-center text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span id="modal-location" class="font-medium"></span>
+          </div>
+        </div>
+      </div>
+      
+      <p id="modal-description" class="text-gray-700 leading-relaxed mb-8 whitespace-pre-wrap"></p>
+      
+      <a id="modal-apply-link" target="_blank" class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-lg hover:opacity-90 transition shadow-lg">
+        Apply Now
+      </a>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, doc, getDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Your Firebase config - replace with your actual config values
     const firebaseConfig = {
@@ -73,51 +133,172 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Anonymous auth for read access (adjust per your rules)
     signInAnonymously(auth).catch((error) => {
       console.error('Auth error:', error);
     });
 
+    // --- Search & Display Elements ---
     const jobListings = document.getElementById('job-listings');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    let allJobs = []; // Array to store all job data for local filtering
 
-    // Use the same "jobs" collection as the admin panel stores jobs
+    // --- Modal Elements ---
+    const jobModal = document.getElementById('job-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCompany = document.getElementById('modal-company');
+    const modalLocation = document.getElementById('modal-location');
+    const modalDescription = document.getElementById('modal-description');
+    const modalApplyLink = document.getElementById('modal-apply-link');
+    const modalCompanyLogo = document.getElementById('modal-company-logo');
+
+    // Reference to the jobs collection
     const jobsCollection = collection(db, "jobs");
     const jobsQuery = query(jobsCollection);
 
-    // Real-time listener to update jobs instantly
+    // Real-time listener to get all jobs and store them locally
     onSnapshot(jobsQuery, (snapshot) => {
-      jobListings.innerHTML = '';
+      allJobs = [];
       if (snapshot.empty) {
-        jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full">No jobs available at the moment.</p>`;
+        jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No jobs available at the moment. Check back later!</p>`;
+      } else {
+        snapshot.forEach(doc => {
+          allJobs.push({ id: doc.id, ...doc.data() });
+        });
+        displayJobs(allJobs);
+      }
+    });
+
+    // Function to filter and display jobs based on the search query
+    const handleSearch = () => {
+      const query = searchInput.value.toLowerCase();
+      const filteredJobs = allJobs.filter(job => {
+        return (
+          job.title.toLowerCase().includes(query) ||
+          job.company.toLowerCase().includes(query) ||
+          job.description.toLowerCase().includes(query) ||
+          job.location.toLowerCase().includes(query)
+        );
+      });
+      displayJobs(filteredJobs);
+    };
+
+    // Function to render job cards to the page (Updated for Posting Time)
+    const displayJobs = (jobsToDisplay) => {
+      jobListings.innerHTML = '';
+      if (jobsToDisplay.length === 0) {
+        jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No jobs match your search criteria.</p>`;
         return;
       }
-      snapshot.forEach(doc => {
-        const job = doc.data();
+      
+      const now = new Date().getTime();
+
+      jobsToDisplay.forEach(job => {
+        const firstLetter = job.company ? job.company.charAt(0).toUpperCase() : '?';
+        
+        // CALCULATE POSTING TIME STRING
+        let postedText = 'Recently posted';
+        if (job.postedAt && job.postedAt.toDate) {
+            const postedTime = job.postedAt.toDate().getTime();
+            const diffInHours = Math.floor((now - postedTime) / (1000 * 60 * 60));
+            
+            if (diffInHours < 24) {
+                postedText = diffInHours === 0 ? 'Posted today' : `${diffInHours} hours ago`;
+            } else {
+                const diffInDays = Math.floor(diffInHours / 24);
+                postedText = `${diffInDays} days ago`;
+            }
+        }
+        // END CALCULATE POSTING TIME STRING
+
         jobListings.innerHTML += `
-          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 border border-gray-200 transition-transform transform hover:-translate-y-1 flex flex-col">
-            <div class="flex items-center mb-4">
-              <div class="w-12 h-12 bg-blue-100 text-blue-700 flex items-center justify-center font-bold rounded-full">
-                ${job.company.charAt(0).toUpperCase()}
+          <div class="job-card bg-white rounded-3xl shadow-xl hover:shadow-2xl p-8 border border-gray-200 transition-all duration-300 transform hover:-translate-y-2 flex flex-col cursor-pointer" data-doc-id="${job.id}">
+            <div class="flex items-start mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-2xl rounded-xl shadow-lg">
+                ${firstLetter}
               </div>
-              <div class="ml-4">
-                <h3 class="text-xl font-bold text-gray-800">${job.title}</h3>
-                <p class="text-sm text-gray-500">${job.company}</p>
+              <div class="ml-5">
+                <h3 class="text-2xl font-bold text-gray-900 leading-tight">${job.title}</h3>
+                <p class="text-sm text-gray-500 mt-1">${job.company}</p>
               </div>
             </div>
-            <p class="text-gray-600 flex-grow mb-6">${job.description.slice(0, 100)}...</p>
+            <p class="text-sm text-blue-500 font-semibold mb-4">${postedText}</p> 
+            <p class="text-gray-600 flex-grow mb-6 leading-relaxed">${job.description.slice(0, 120)}...</p>
             <div class="text-gray-500 flex items-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>${job.location}</span>
+              <span class="font-medium">${job.location}</span>
             </div>
-            <a href="${job.applyLink}" target="_blank" class="mt-auto inline-block text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition">
-              Apply Now
-            </a>
+            <div class="mt-auto">
+              <button class="w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-lg">
+                View Details
+              </button>
+            </div>
           </div>
         `;
       });
+    };
+
+    // --- Event Listeners ---
+
+    // Search bar functionality
+    searchButton.addEventListener('click', handleSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    });
+
+    // Event delegation to open the modal
+    jobListings.addEventListener('click', (event) => {
+      const card = event.target.closest('.job-card');
+      if (card) {
+        const docId = card.dataset.docId;
+        const job = allJobs.find(j => j.id === docId); // Find the job from the local array
+        if (job) {
+          populateModal(job);
+          showModal();
+        }
+      }
+    });
+
+    // Populate modal with job data
+    const populateModal = (job) => {
+      const firstLetter = job.company ? job.company.charAt(0).toUpperCase() : '?';
+      modalCompanyLogo.textContent = firstLetter;
+      modalTitle.textContent = job.title;
+      modalCompany.textContent = job.company;
+      modalLocation.textContent = job.location;
+      modalDescription.textContent = job.description;
+      modalApplyLink.href = job.applyLink;
+    };
+
+    // Show the modal
+    const showModal = () => {
+      jobModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Hide the modal
+    const hideModal = () => {
+      jobModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    };
+
+    // Event listeners to close the modal
+    closeModalBtn.addEventListener('click', hideModal);
+    jobModal.addEventListener('click', (e) => {
+      if (e.target === jobModal) {
+        hideModal();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideModal();
+      }
     });
   </script>
 </body>
