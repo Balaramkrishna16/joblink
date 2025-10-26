@@ -1,4 +1,4 @@
-window.env = {
+const rawConfig = {
   APP_FIREBASE_API_KEY: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
   APP_FIREBASE_AUTH_DOMAIN: "job-portal-a5287.firebaseapp.com",
   APP_FIREBASE_PROJECT_ID: "job-portal-a5287",
