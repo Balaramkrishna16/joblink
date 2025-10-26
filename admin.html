@@ -67,18 +67,22 @@
 
     <div class="flex flex-1 overflow-hidden">
       <aside class="w-72 bg-white shadow-inner border-r border-gray-200 p-8 flex flex-col space-y-4">
+        <!-- All Resources Button -->
         <button onclick="showSection('resources')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13a2.003 2.003 0 100 3.999 2.003 2.003 0 000-3.999zm0 0h.01a2.003 2.003 0 110 3.999 2.003 2.003 0 010-3.999zM21 9h-4.25a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75H21a.75.75 0 00.75-.75v-1.5a.75.75 0 00-.75-.75zM3 9h4.25a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75H3A.75.75 0 012.25 11.25v-1.5A.75.75 0 013 9z" /></svg>
           All Resources
         </button>
+        <!-- Add Resource Button -->
         <button onclick="showSection('add-resource')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
           Add New Resource
         </button>
+        <!-- Existing: All Jobs Button -->
         <button onclick="showSection('jobs')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
           All Jobs
         </button>
+        <!-- Existing: Add Job Button -->
         <button onclick="showSection('add-job')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
           Add New Job
@@ -87,12 +91,15 @@
 
       <main class="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-10 overflow-auto rounded-tr-3xl">
 
+        <!-- New: All Resources Section -->
         <section id="resources-section" class="hidden">
           <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">All Resources</h2>
           <div id="resources-list" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-             </div>
+             <!-- Resources will be loaded here -->
+          </div>
         </section>
 
+        <!-- New: Add Resource Section -->
         <section id="add-resource-section" class="hidden max-w-xl">
           <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Resource</h2>
           <form id="add-resource-form" class="space-y-8 p-8 bg-white rounded-3xl shadow-xl border border-indigo-200">
@@ -102,11 +109,13 @@
           </form>
         </section>
 
+        <!-- Existing: All Jobs Section -->
         <section id="jobs-section" class="hidden">
           <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">All Job Listings</h2>
           <div id="jobs-list" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3"></div>
         </section>
 
+        <!-- Existing: Add Job Section -->
         <section id="add-job-section" class="hidden max-w-xl">
           <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Job</h2>
           <form id="add-job-form" class="space-y-8 p-8 bg-white rounded-3xl shadow-xl border border-indigo-200">
@@ -122,21 +131,29 @@
     </div>
   </div>
 
+  <!-- CRITICAL FIX: Ensure env-config.js is loaded BEFORE the main script -->
+  <script src="env-config.js"></script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    // ADDED Timestamp import
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, Timestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // CLEAN CONFIG: Directly use the window.env object (no hardcoded fallback)
     const firebaseConfig = {
-      apiKey: window.env?.APP_FIREBASE_API_KEY,  
-      authDomain: window.env?.APP_FIREBASE_AUTH_DOMAIN, 
+      apiKey: window.env?.APP_FIREBASE_API_KEY,
+      authDomain: window.env?.APP_FIREBASE_AUTH_DOMAIN,
       projectId: window.env?.APP_FIREBASE_PROJECT_ID,
       storageBucket: window.env?.APP_FIREBASE_STORAGE_BUCKET,
       messagingSenderId: window.env?.APP_FIREBASE_MESSAGING_SENDER_ID,
       appId: window.env?.APP_FIREBASE_APP_ID,
-      measurementId: window.env?.APP_FIREBASE_MEASUREMENT_ID 
+      measurementId: window.env?.APP_FIREBASE_MEASUREMENT_ID
     };
+    
+    // BASIC CHECK: Ensure Firebase initialized
+    if (!firebaseConfig.apiKey) {
+        console.error("FIREBASE ERROR: API Key is missing. Check if 'env-config.js' loaded correctly.");
+    }
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -154,22 +171,31 @@
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      loginError.classList.add("hidden"); // Hide previous error
+      
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        // Attempt to sign in
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("Login successful:", userCredential.user.uid);
+        // The onAuthStateChanged listener handles the screen switch
+        
       } catch (error) {
-        loginError.textContent = "Invalid credentials. Try again.";
+        console.error("Login attempt failed:", error.code, error.message);
+        loginError.textContent = "Invalid credentials or login failed. Try again.";
         loginError.classList.remove("hidden");
       }
     });
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        // User is logged in
         loginScreen.classList.add('hidden');
         dashboard.classList.remove('hidden');
         showSection('resources'); // Default to resources on login
         loadResources();
         loadJobs();
       } else {
+        // User is logged out
         loginScreen.classList.remove('hidden');
         dashboard.classList.add('hidden');
       }
@@ -184,7 +210,6 @@
         description: document.getElementById('job-description').value,
         location: document.getElementById('job-location').value,
         applyLink: document.getElementById('job-link').value,
-        // ADDED: Timestamp for automatic deletion
         postedAt: Timestamp.now() 
       };
       await addDoc(collection(db, "jobs"), job);
@@ -210,9 +235,10 @@
 
       querySnapshot.forEach((docSnap) => {
           const job = docSnap.data();
-          const postedTime = job.postedAt ? job.postedAt.toDate().getTime() : 0;
+          // Safely check if postedAt exists and is a Firestore Timestamp
+          const postedTime = job.postedAt && job.postedAt.toDate ? job.postedAt.toDate().getTime() : 0;
           
-          if (now - postedTime > twentyDaysInMs) {
+          if (postedTime !== 0 && now - postedTime > twentyDaysInMs) {
               jobsToDelete.push(docSnap.id);
               jobsDeleted = true;
           } else {
@@ -225,11 +251,8 @@
           await deleteDoc(doc(db, "jobs", id));
       }
 
-      // If jobs were deleted, reload to reflect accurate count, otherwise continue
       if (jobsDeleted) {
-          console.log(`Deleted ${jobsToDelete.length} expired jobs.`);
-          // If deletion occurred, we reload the function to be safe, 
-          // although 'activeJobs' is technically correct, reloading ensures consistency.
+          console.log(`Deleted ${jobsToDelete.length} expired jobs. Reloading list.`);
           return loadJobs(); 
       }
 
@@ -265,7 +288,7 @@
       }
     };
 
-    // --- Resource Management (No changes needed for 20-day rule here) ---
+    // --- Resource Management ---
 
     addResourceForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -328,5 +351,4 @@
     };
   </script>
 </body>
-
 </html>
