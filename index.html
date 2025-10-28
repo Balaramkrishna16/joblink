@@ -126,6 +126,14 @@
         .form-checkbox:checked { background-color: #3b82f6; border-color: #3b82f6; background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.293 6.293a1 1 0 011.414 1.414l-6 6a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L6 10.586l5.293-5.293z'/%3e%3c/svg%3e"); background-size: 1rem 1rem; background-repeat: no-repeat; background-position: center; }
         body.dark .form-checkbox { border-color: #4b5563; background-color: #1f2937; }
         body.dark .form-checkbox:checked { background-color: #3b82f6; }
+
+        /* ====== Modal small custom styles (only these lines added) ====== */
+        .modal-overlay { background-color: rgba(0,0,0,0.72); }
+        .modal-container { max-width: 720px; width: 100%; }
+        @keyframes modal-slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content { animation: modal-slide-up 0.28s ease-out forwards; }
+        .modal-company-badge { width: 64px; height: 64px; border-radius: 14px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:28px; }
+        /* ================================================================ */
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -142,7 +150,7 @@
             
             <div class="flex flex-col space-y-4 text-lg font-medium">
                 <a href="index.html" class="highlighted-link font-extrabold text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
-                <a href="hackthons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">ackthons</a>
+                <a href="hackthons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Hackthons</a>
                 <a href="resources.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Resources</a>
                 <a href="Assesment.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assesments</a>
                 <a href="#analytics" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
@@ -314,8 +322,70 @@
                 </p>
             </div>
         </footer>
-    </div> <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+    </div>
+
+    <!-- ====== INSERTED MODAL (keeps styling consistent with your theme) ====== -->
+    <!-- <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+      <div class="bg-white rounded-3xl shadow-xl p-8 w-full modal-container relative modal-content max-h-[90vh] overflow-y-auto">
+        <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
+        <div class="flex items-start mb-6">
+          <div id="modal-company-logo" class="modal-company-badge bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-lg mr-4"></div>
+          <div class="ml-2">
+            <h3 id="modal-title" class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1 modal-title-text"></h3>
+            <p id="modal-company" class="text-base sm:text-lg text-gray-600 mb-2 modal-company-text"></p>
+            <div class="flex items-center text-gray-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <span id="modal-location" class="font-medium"></span>
+            </div>
+          </div>
         </div>
+
+        <p id="modal-description" class="text-gray-700 leading-relaxed mb-6 modal-description-text"></p>
+
+        <div class="flex gap-3 items-center">
+          <a id="modal-apply-link" target="_blank" rel="noopener" class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-lg">Apply Now</a>
+          <div id="modal-posted" class="text-sm text-gray-500"></div>
+        </div>
+      </div>
+    </div> -->
+    <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 w-full modal-container relative modal-content max-h-[90vh] overflow-y-auto">
+    <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition" aria-label="Close">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <div class="flex items-start mb-6">
+      <div id="modal-company-logo" class="modal-company-badge bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-xl shadow-lg mr-4"></div>
+      <div class="ml-2">
+        <!-- Fixed: Title (Role) color -->
+        <h3 id="modal-title" class="text-2xl sm:text-3xl font-extrabold text-black dark:text-white mb-1 modal-title-text"></h3>
+        <!-- Fixed: Company color -->
+        <p id="modal-company" class="text-base sm:text-lg text-black dark:text-gray-300 mb-2 modal-company-text"></p>
+        <div class="flex items-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span id="modal-location" class="font-medium"></span>
+        </div>
+      </div>
+    </div>
+
+    <p id="modal-description" class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 modal-description-text"></p>
+
+    <div class="flex gap-3 items-center">
+      <a id="modal-apply-link" target="_blank" rel="noopener" class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-lg">Apply Now</a>
+      <div id="modal-posted" class="text-sm text-gray-500"></div>
+    </div>
+  </div>
+</div>
+
+    <!-- ====== END INSERTED MODAL ====== -->
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -354,6 +424,13 @@
         const resetFiltersButton = document.getElementById('reset-filters');
         const jobModal = document.getElementById('job-modal');
         const closeModalBtn = document.getElementById('close-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCompany = document.getElementById('modal-company');
+        const modalLocation = document.getElementById('modal-location');
+        const modalDescription = document.getElementById('modal-description');
+        const modalApplyLink = document.getElementById('modal-apply-link');
+        const modalCompanyLogo = document.getElementById('modal-company-logo');
+        const modalPosted = document.getElementById('modal-posted');
         
         let allJobs = [];
         let currentFilters = { location: '', employmentTypes: [] };
@@ -532,7 +609,51 @@
             newJobsEl.textContent = newJobs.length;
         };
 
-        // (Modal functions abbreviated)
+        // ====== Modal functions (added) ======
+        const populateModal = (job) => {
+            const firstLetter = job.company ? job.company.charAt(0).toUpperCase() : '?';
+            modalCompanyLogo.textContent = firstLetter;
+            modalTitle.textContent = job.title || '';
+            modalCompany.textContent = job.company || '';
+            modalLocation.textContent = job.location || '';
+            modalDescription.textContent = job.description || '';
+            modalApplyLink.href = job.applyLink || '#';
+            if (job.postedAt && job.postedAt.toDate) {
+                const postedDate = job.postedAt.toDate();
+                modalPosted.textContent = `Posted: ${postedDate.toLocaleString()}`;
+            } else {
+                modalPosted.textContent = '';
+            }
+        };
+
+        const showModal = () => {
+            jobModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const hideModal = () => {
+            jobModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        };
+
+        // Close modal handlers
+        if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
+        jobModal?.addEventListener('click', (e) => { if (e.target === jobModal) hideModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideModal(); });
+
+        // Delegated click listener on job list to open modal when any job-card or its "View Details" button is clicked
+        jobListings.addEventListener('click', (event) => {
+            const card = event.target.closest('.job-card');
+            if (card) {
+                const docId = card.dataset.docId;
+                const job = allJobs.find(j => j.id === docId);
+                if (job) {
+                    populateModal(job);
+                    showModal();
+                }
+            }
+        });
+        // ====== End modal functions ======
         
         // 🌗 Theme toggle
         const themeToggle = document.getElementById('theme-toggle');
