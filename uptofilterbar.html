@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 1.2s ease-out; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.7); }
+        .modal-container { max-width: 640px; }
+        .modal-content { animation: modal-slide-up 0.3s ease-out forwards; }
+        @keyframes modal-slide-up { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* 🌙 Dark Mode Styles */
+        body.dark {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        body.dark header { background-color: rgba(15,23,42,0.95); }
+        body.dark .job-card { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
+        body.dark footer { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
+        body.dark input { color: white; }
+        
+        /* Job card description text on card (which uses text-gray-600) to white in dark mode */
+        body.dark .job-card .description-text { color: white !important; }
+
+        /* --- Custom Styles for User Requests & Consistency --- */
+        /* Logo "Job" part: Black in light mode (via text-gray-800), White in dark mode */
+        body.dark .logo-job-text { color: white; }
+        /* Dashboard stat numbers: Always white */
+        .dashboard-stat-value { color: white !important; }
+        /* Modal Title & Company Name: White in light mode, original dark mode colors retained */
+        .modal-title-text { color: white !important; }
+        .modal-company-text { color: white !important; }
+        body.dark .modal-company-text { color: #9ca3af !important; /* Matches dark:text-gray-400 */ }
+        /* Resources Link and Modal Description text white in Dark Mode */
+        body.dark .resources-link { color: white !important; }
+        body.dark .modal-description-text { color: white !important; }
+
+        /* Sidebar Theme Consistency */
+        .sidebar-panel { 
+            /* Light Mode Default: White background, black text */
+            background-color: white; 
+            border-color: #e5e7eb;
+            color: #1f2937; /* Default text black/gray-800 equivalent */
+        } 
+        .sidebar-panel .text-gray-700 { color: #374151; /* Default label text */ }
+        .sidebar-panel .text-gray-600 { color: #4b5563; /* Default checkbox label text */ }
+        body.dark .sidebar-panel { 
+            /* Dark Mode Overrides */
+            background-color: #1e293b; 
+            border-color: #334155;
+            color: #f1f5f9; /* White text */
+        }
+        body.dark .sidebar-panel .text-gray-700,
+        body.dark .sidebar-panel .text-gray-600 {
+             color: #d1d5db; /* Light gray text for dark mode labels */
+        }
+
+
+        /* Tab Styles */
+        .tab-button {
+            transition: all 0.2s;
+            border-radius: 9999px; 
+            padding: 0.75rem 2rem; 
+            font-weight: 600; 
+        }
+        .tab-button.active {
+            background: linear-gradient(to right, #2563eb, #9333ea);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .tab-button:not(.active) {
+            background-color: #e5e7eb;
+            color: #1f2937; 
+        }
+        body.dark .tab-button:not(.active) {
+            background-color: #374151;
+            color: #f3f4f6; 
+        }
+        
+        /* Mobile Search Bar Fixes: Controlled primarily by Tailwind classes now */
+        .search-container {
+            display: flex;
+            flex-direction: column; /* Stack input and button on mobile */
+            gap: 0.5rem; 
+            padding: 0.25rem;
+        }
+
+        /* Ensure input and button are full width on mobile */
+        .search-container > input, .search-container > button {
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            /* Desktop/Tablet: Return to row layout */
+            .search-container {
+                flex-direction: row; 
+                gap: 0;
+            }
+            /* Input takes the majority of space on larger screens */
+            .search-container > input {
+                flex-grow: 1;
+                width: auto; 
+            }
+            .search-container > button {
+                width: auto;
+            }
+        }
+
+        /* --- Custom Checkbox Styles for Sidebar --- */
+        .form-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            height: 1rem;
+            width: 1rem;
+            border: 2px solid currentColor;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        .form-checkbox:checked {
+            background-color: #3b82f6; /* blue-500 */
+            border-color: #3b82f6;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.293 6.293a1 1 0 011.414 1.414l-6 6a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L6 10.586l5.293-5.293z'/%3e%3c/svg%3e");
+            background-size: 1rem 1rem;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        body.dark .form-checkbox {
+            border-color: #4b5563; /* gray-600 */
+            background-color: #1f2937; /* gray-800 */
+        }
+        body.dark .form-checkbox:checked {
+            background-color: #3b82f6; /* blue-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-3xl font-extrabold tracking-tight">
+                <span class="logo-job-text text-gray-800">Job</span><span class="text-blue-600">Search</span>
+            </a>
+
+            <div class="flex items-center space-x-4">
+                <a href="resources.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition resources-link">Resources</a>
+
+                <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+<section class="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-12 sm:py-24 text-center overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                <circle cx="5" cy="5" r="1.5" fill="rgba(255,255,255,0.2)" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#pattern-circles)" />
+        </svg>
+    </div>
+    <div class="container mx-auto px-6 relative z-10">
+        <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 animate-fadeIn">
+            Discover Your Dream Career
+        </h1>
+        <p class="text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 opacity-90 leading-relaxed">
+            Explore top job opportunities from trusted companies. Apply instantly with just one click.
+        </p>
+        
+        <div class="max-w-xl mx-auto">
+            <div class="flex flex-col sm:flex-row bg-white rounded-xl shadow-xl overflow-hidden p-1">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search for jobs, companies, or keywords..." 
+                    class="flex-grow px-4 py-3 text-gray-800 bg-transparent placeholder-gray-400 focus:outline-none w-full sm:w-auto" 
+                />
+                <button 
+                    id="search-button" 
+                    class="mt-2 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 w-full sm:w-auto"
+                >
+                    Search
+                </button>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+    <section class="container mx-auto px-6 pt-6 sm:pt-10 pb-4 text-center">
+        <div class="inline-flex space-x-2 sm:space-x-4 p-1 rounded-full bg-gray-200 dark:bg-gray-700 shadow-inner">
+            <button id="tab-jobs" class="tab-button active text-sm sm:text-base px-6 py-2" data-type="job">
+                Jobs
+            </button>
+            <button id="tab-internships" class="tab-button text-sm sm:text-base px-6 py-2" data-type="internship">
+                Internships
+            </button>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 py-6 sm:py-8">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 sm:mb-10">Dashboard Analytics</h2>
+        <div id="analytics" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 text-center">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                <h3 class="text-xl sm:text-2xl font-bold text-blue-600 mb-2">Total Listings</h3>
+                <p id="total-jobs" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                <h3 class="text-xl sm:text-2xl font-bold text-purple-600 mb-2">Companies</h3>
+                <p id="total-companies" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                <h3 class="text-xl sm:text-2xl font-bold text-indigo-600 mb-2">New This Week</h3>
+                <p id="new-jobs" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-6 pb-16 flex-1 lg:grid lg:grid-cols-[280px_1fr] gap-10">
+        
+        <aside id="filter-sidebar" class="lg:block mb-8 lg:mb-0">
+            <div class="sticky top-24 sidebar-panel rounded-2xl shadow-xl p-6 border transition-all duration-300">
+                <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                    Filter Results ⚙️
+                </h3>
+                
+                <div class="mb-6">
+                    <label for="filter-location" class="block text-sm font-medium mb-2 text-gray-700">Location</label>
+                    <input type="text" id="filter-location" placeholder="e.g., Remote, New York" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 text-sm" />
+                </div>
+
+                <div class="mb-6">
+                    <p class="block text-sm font-medium mb-2 text-gray-700">Employment Type</p>
+                    <div id="filter-employment-types" class="space-y-2">
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" name="employment-type" value="Full-time" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Full-time
+                        </label>
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" name="employment-type" value="Part-time" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Part-time
+                        </label>
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" name="employment-type" value="Contract" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Contract
+                        </label>
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" name="employment-type" value="Remote" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Remote
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="apply-filters" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">Apply Filters</button>
+                    <button id="reset-filters" class="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-semibold">Reset</button>
+                </div>
+            </div>
+        </aside>
+
+        <div id="job-listings-container" class="lg:col-span-1">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 sm:mb-12" id="listing-title">Featured Jobs ✨</h2>
+            <div id="job-listings" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-2"></div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-8 sm:py-10 text-center text-sm border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <p>&copy; 2025 JobSearch. All rights reserved. | Connect with us on 
+                <a href="https://www.linkedin.com/company/jobsearch16/" target="_blank" class="text-blue-400 hover:text-blue-300 hover:underline font-semibold transition">
+                    LinkedIn
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8 w-full modal-container relative modal-content overflow-y-auto max-h-[90vh]">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition">
+                ✖
+            </button>
+
+            <div class="flex items-start mb-6">
+                <div id="modal-company-logo" class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-2xl sm:text-3xl rounded-xl shadow-lg"></div>
+                <div class="ml-4 sm:ml-6">
+                    <h3 id="modal-title" class="text-2xl sm:text-3xl font-extrabold mb-1 modal-title-text"></h3>
+                    <p id="modal-company" class="text-base sm:text-lg modal-company-text mb-2"></p>
+                    <div class="flex items-center text-gray-500 text-sm sm:text-base">
+                        📍 <span id="modal-location" class="font-medium ml-1"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <p id="modal-description" class="text-gray-700 dark:text-gray-200 leading-relaxed mb-6 sm:mb-8 whitespace-pre-wrap modal-description-text text-sm sm:text-base"></p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a id="modal-apply-link" target="_blank" class="flex-1 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 sm:py-4 px-6 rounded-lg hover:opacity-90 transition shadow-lg text-base sm:text-lg">
+                    Apply Now
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
+            authDomain: "job-portal-a5287.firebaseapp.com",
+            projectId: "job-portal-a5287",
+            storageBucket: "job-portal-a5287.firebasestorage.app",
+            messagingSenderId: "662364695020",
+            appId: "1:662364695020:web:c609a35f35066c9d21b8c9",
+            measurementId: "G-NWGMC1TC1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        signInAnonymously(auth).catch(console.error);
+
+        // --- DOM Elements ---
+        const jobListings = document.getElementById('job-listings');
+        const totalJobsEl = document.getElementById('total-jobs');
+        const totalCompaniesEl = document.getElementById('total-companies');
+        const newJobsEl = document.getElementById('new-jobs');
+        const listingTitle = document.getElementById('listing-title');
+        const searchInput = document.getElementById('search-input'); 
+        const searchButton = document.getElementById('search-button'); 
+        
+        const tabJobs = document.getElementById('tab-jobs');
+        const tabInternships = document.getElementById('tab-internships');
+        let currentTab = 'job'; 
+        
+        // Sidebar Elements
+        const filterLocationInput = document.getElementById('filter-location');
+        const filterEmploymentCheckboxes = document.querySelectorAll('input[name="employment-type"]');
+        const applyFiltersButton = document.getElementById('apply-filters');
+        const resetFiltersButton = document.getElementById('reset-filters');
+        
+        let allJobs = [];
+        let currentFilters = {
+            location: '',
+            employmentTypes: []
+        };
+
+        const jobModal = document.getElementById('job-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCompany = document.getElementById('modal-company');
+        const modalLocation = document.getElementById('modal-location');
+        const modalDescription = document.getElementById('modal-description');
+        const modalApplyLink = document.getElementById('modal-apply-link');
+        const modalCompanyLogo = document.getElementById('modal-company-logo');
+
+        const jobsCollection = collection(db, "jobs");
+        const jobsQuery = query(jobsCollection);
+
+        // --- CORE FUNCTIONALITY ---
+        
+        // Function to handle the filtering and display logic
+        const filterAndDisplay = (type, searchTerm = '') => {
+            currentTab = type;
+            const term = searchTerm.toLowerCase().trim();
+            
+            // 1. Filter by Type (Job/Internship tab)
+            let filteredJobs = allJobs.filter(job => 
+                job.type ? job.type.toLowerCase() === type : type === 'job'
+            );
+
+            // 2. Filter by Sidebar Filters
+            filteredJobs = filteredJobs.filter(job => {
+                // Location Filter
+                const locationTerm = currentFilters.location.toLowerCase();
+                const locationMatch = !locationTerm || 
+                                      job.location.toLowerCase().includes(locationTerm);
+
+                // Employment Type Filter
+                let employmentMatch = true;
+                if (currentFilters.employmentTypes.length > 0) {
+                    // Normalize job's employmentType (default to Full-time if missing)
+                    const jobEmploymentType = (job.employmentType || 'Full-time').toLowerCase(); 
+
+                    const isRemoteJob = job.location.toLowerCase().includes('remote');
+                    const hasRemoteFilter = currentFilters.employmentTypes.includes('Remote');
+                    
+                    if (currentFilters.employmentTypes.length === 1 && hasRemoteFilter) {
+                        employmentMatch = isRemoteJob;
+                    } 
+                    else if (hasRemoteFilter) {
+                        const nonRemoteFilters = currentFilters.employmentTypes.filter(t => t !== 'Remote').map(t => t.toLowerCase());
+                        const typeMatch = nonRemoteFilters.length === 0 || nonRemoteFilters.includes(jobEmploymentType);
+                        
+                        employmentMatch = typeMatch && isRemoteJob;
+                    } else {
+                        const typeMatch = currentFilters.employmentTypes.map(t => t.toLowerCase()).includes(jobEmploymentType);
+                        employmentMatch = typeMatch;
+                    }
+                }
+                
+                return locationMatch && employmentMatch;
+            });
+
+
+            // 3. Filter by Search Term (if provided)
+            if (term) {
+                filteredJobs = filteredJobs.filter(job =>
+                    job.title.toLowerCase().includes(term) ||
+                    job.company.toLowerCase().includes(term) ||
+                    job.location.toLowerCase().includes(term) ||
+                    job.description.toLowerCase().includes(term)
+                );
+            }
+
+            // Update UI
+            updateTabStyles(type);
+            displayJobs(filteredJobs);
+            updateAnalytics(filteredJobs);
+        }
+
+        // --- EVENT LISTENERS ---
+
+        // 1. Real-time Firebase Listener
+        onSnapshot(jobsQuery, (snapshot) => {
+            allJobs = [];
+            snapshot.forEach(doc => allJobs.push({ id: doc.id, ...doc.data() }));
+            filterAndDisplay(currentTab, searchInput.value);
+        });
+
+        // 2. Tab Listeners
+        tabJobs.addEventListener('click', () => filterAndDisplay('job', searchInput.value));
+        tabInternships.addEventListener('click', () => filterAndDisplay('internship', searchInput.value));
+
+        // 3. Search Listeners
+        const runSearch = () => {
+            filterAndDisplay(currentTab, searchInput.value);
+        };
+        searchButton.addEventListener('click', runSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                runSearch();
+            }
+        });
+        
+        // 4. Sidebar Filter Listeners
+        applyFiltersButton.addEventListener('click', () => {
+            currentFilters.location = filterLocationInput.value.trim();
+            currentFilters.employmentTypes = Array.from(filterEmploymentCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+                
+            filterAndDisplay(currentTab, searchInput.value);
+        });
+
+        resetFiltersButton.addEventListener('click', () => {
+            filterLocationInput.value = '';
+            filterEmploymentCheckboxes.forEach(cb => cb.checked = false);
+            
+            currentFilters = { location: '', employmentTypes: [] };
+            
+            filterAndDisplay(currentTab, searchInput.value);
+        });
+        
+        // --- HELPER FUNCTIONS ---
+
+        const updateTabStyles = (type) => {
+            tabJobs.classList.remove('active');
+            tabInternships.classList.remove('active');
+            if (type === 'job') {
+                tabJobs.classList.add('active');
+                listingTitle.textContent = "Featured Jobs ✨";
+            } else {
+                tabInternships.classList.add('active');
+                listingTitle.textContent = "Featured Internships 🚀";
+            }
+        };
+
+
+        const displayJobs = (jobs) => {
+            jobListings.innerHTML = '';
+            if (!jobs.length) {
+                const searchStatus = searchInput.value.trim() ? ` for "${searchInput.value.trim()}"` : '';
+                jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No ${currentTab} listings found${searchStatus}.</p>`;
+                return;
+            }
+
+            const now = Date.now();
+            jobs.forEach(job => {
+                const firstLetter = job.company?.[0]?.toUpperCase() || '?';
+                let postedText = 'Recently posted';
+                if (job.postedAt?.toDate) {
+                    const diffHours = Math.floor((now - job.postedAt.toDate().getTime()) / 3600000);
+                    postedText = diffHours < 24 ? `${diffHours} hrs ago` : `${Math.floor(diffHours / 24)} days ago`;
+                }
+
+                jobListings.innerHTML += `
+                    <div class="job-card bg-white rounded-3xl shadow-xl hover:shadow-2xl p-8 border border-gray-200 transition-all duration-300 transform hover:-translate-y-2 flex flex-col cursor-pointer" data-doc-id="${job.id}">
+                        <div class="flex items-start mb-4">
+                            <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-2xl rounded-xl shadow-lg">${firstLetter}</div>
+                            <div class="ml-5">
+                                <h3 class="text-2xl font-bold leading-tight">${job.title}</h3>
+                                <p class="text-sm text-gray-500 mt-1">${job.company}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-blue-500 font-semibold mb-4">${postedText}</p> 
+                        <p class="text-gray-600 flex-grow mb-6 leading-relaxed description-text">${job.description.slice(0, 120)}...</p>
+                        <div class="text-gray-500 flex items-center mb-4">
+                            📍<span class="font-medium ml-1">${job.location}</span>
+                        </div>
+                        <button class="w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition shadow-lg">
+                            View Details
+                        </button>
+                    </div>`;
+            });
+        };
+
+        const updateAnalytics = (jobs) => {
+            const companies = new Set(jobs.map(j => j.company));
+            const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+            const newJobs = allJobs.filter(j => j.postedAt?.toDate && (Date.now() - j.postedAt.toDate().getTime()) < oneWeekInMs);
+            
+            totalJobsEl.textContent = jobs.length;
+            totalCompaniesEl.textContent = companies.size;
+            newJobsEl.textContent = newJobs.length;
+        };
+
+        // Modal functions
+        jobListings.addEventListener('click', e => {
+            const card = e.target.closest('.job-card');
+            if (!card) return;
+            const job = allJobs.find(j => j.id === card.dataset.docId);
+            if (job) populateModal(job);
+        });
+
+        const populateModal = (job) => {
+            modalTitle.textContent = job.title;
+            modalCompany.textContent = job.company;
+            modalLocation.textContent = job.location;
+            modalDescription.textContent = job.description;
+            modalApplyLink.href = job.applyLink;
+            modalCompanyLogo.textContent = job.company?.[0]?.toUpperCase() || '?';
+            
+            jobModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+        closeModalBtn.onclick = () => { jobModal.classList.add('hidden'); document.body.style.overflow = 'auto'; };
+
+        // 🌗 Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark');
+            themeIcon.textContent = '☀️';
+        }
+        themeToggle.onclick = () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+        };
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Learning Resources - JobSearch</title>
+    <title>About Us - JobSearch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
     <style>
@@ -17,14 +17,7 @@
             font-family: 'Inter', sans-serif; 
             transition: background 0.3s, color 0.3s;
         }
-        .resource-card {
-            transition: all 0.3s ease-out;
-        }
-        .resource-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
+        
         /* NEW STYLE: Apply Playfair Display and text shadow for high impact */
         .main-heading-font {
             font-family: 'Playfair Display', serif;
@@ -39,56 +32,31 @@
             color: #f1f5f9;
         }
         body.dark header { background-color: rgba(15,23,42,0.95); }
-        body.dark .resource-card { background-color: #1e293b; border-color: #334155; }
+        body.dark .content-card { background-color: #1e293b; border-color: #334155; }
         body.dark footer { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
-        body.dark input { 
-            color: white !important; 
-            background-color: #334155; 
-            border-color: #475569; 
-        }
-        body.dark input::placeholder {
-            color: #a1a1aa;
-        }
+        body.dark input { color: white; }
         
         /* DARK/LIGHT COLOR OVERRIDES */
         body.dark .logo-job-text { color: white !important; }
-        body.dark .nav-text { color: white !important; }
+        .logo-job-text { color: #1f2937; } /* Light mode default */
+        .heading-text { color: #1f2937; } /* Light mode default */
         body.dark .heading-text { color: white !important; }
-        body.dark .resource-name { color: #f1f5f9; }
+        
+        /* Dashboard numbers remain white for contrast against dark background */
+        .dashboard-stat-value { color: white !important; }
 
-        /* LIGHT MODE DEFAULT STYLES */
-        .logo-job-text { color: #1f2937; }
-        .nav-text { color: #4b5563; }
-        .heading-text { color: #1f2937; }
-
-        /* --- Sidebar Theme Consistency FIX --- */
+        /* --- Sidebar Theme Consistency --- */
         .sidebar-panel { 
             background-color: white; 
             border-color: #e5e7eb;
         } 
-        /* Sidebar Links in Light Mode */
-        #main-nav-sidebar a, #mobile-nav-sidebar a {
-            color: #4b5563; 
-        }
+        #main-nav-sidebar a { color: #4b5563; }
+        body.dark .sidebar-panel { background-color: #1e293b; border-color: #334155; }
+        body.dark #main-nav-sidebar a { color: #d1d5db; }
+        .sidebar-panel .highlighted-link { color: #2563eb !important; }
+        body.dark .sidebar-panel .highlighted-link { color: #60a5fa !important; }
         
-        body.dark .sidebar-panel { 
-            background-color: #1e293b; 
-            border-color: #334155;
-        }
-        /* Sidebar Links in Dark Mode */
-        body.dark #main-nav-sidebar a, body.dark #mobile-nav-sidebar a {
-             color: #d1d5db; 
-        }
-        /* Highlighted link text must be visible in both modes */
-        .sidebar-panel .highlighted-link {
-            color: #2563eb !important; 
-        }
-        body.dark .sidebar-panel .highlighted-link {
-            color: #60a5fa !important;
-        }
-
-
-        /* 1. PERMANENT LEFT NAVIGATION SIDEBAR (Desktop) */
+        /* --- Navigation & Content Layout --- */
         #main-nav-sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -101,12 +69,8 @@
             transform: translateX(-100%); 
             transition: transform 0.3s ease-in-out;
         }
-        #main-nav-sidebar.open {
-            transform: translateX(0); 
-        }
-        body.dark #main-nav-sidebar { border-right-color: #334155; }
+        #main-nav-sidebar.open { transform: translateX(0); }
 
-        /* 2. CONTENT WRAPPER (Dynamic Shift) */
         #content-wrapper {
             width: 100%;
             transition: margin-left 0.3s ease-in-out;
@@ -118,26 +82,24 @@
             }
         }
         
-        /* 3. TOGGLE BUTTON FIX */
-        /* FIX: Moved position to clear sticky header */
+        /* Toggle Button Fixes */
         #main-nav-toggle {
             position: fixed; 
-            top: 80px; /* Changed from top-5 to top-20 equivalent */
-            left: 20px;
-            z-index: 100; 
+            top: 80px; 
+            left: 20px; 
+            z-index: 100;
         }
-
         #main-nav-toggle.hidden-when-open { display: none !important; }
         @media (max-width: 1023px) {
              #main-nav-toggle { display: none !important; }
         }
 
-        /* Mobile Menu (Hamburger) */
+        /* Mobile Menu */
         #mobile-nav-sidebar {
             transition: transform 0.3s ease-out;
             transform: translateX(-100%);
             z-index: 60; 
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
         }
         #mobile-nav-sidebar.open { transform: translateX(0); }
         #sidebar-overlay { transition: opacity 0.3s ease-out; }
@@ -152,6 +114,7 @@
             opacity: 1;
             transform: translateX(0);
         }
+        
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -168,12 +131,11 @@
             
             <div id="nav-links-container" class="flex flex-col space-y-4 text-lg font-medium">
                 <a href="index.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
-                <a href="hackthons.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Hackathons</a>
-                <a href="resources.html" class="nav-link-item highlighted-link font-extrabold transition p-2 ">Resources</a>
-                <a href="Assesment.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assessments</a>
+                <a href="hackathons.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Hackathons</a>
+                <a href="resources.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Resources</a>
+                <a href="assessments.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Assessments</a>
                 <a href="index.html#analytics" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-                <a href="aboutus.html" class="nav-link-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">About Us</a>
-
+                <a href="aboutus.html" class="nav-link-item highlighted-link font-extrabold transition p-2">About Us</a>
             </div>
             
             <button id="close-desktop-sidebar" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
@@ -194,11 +156,11 @@
             </div>
             <nav class="flex flex-col space-y-4 text-lg font-medium">
                 <a href="index.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Home</a>
-                <a href="hackthons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Hackthons</a>
-                <a href="resources.html" class="highlighted-link font-extrabold transition">Resources</a>
-                <a href="Assesment.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assesments</a>
+                <a href="hackathons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Hackathons</a>
+                <a href="resources.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Resources</a>
+                <a href="assessments.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assessments</a>
                 <a href="index.html#analytics" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Dashboard</a>
-                <a href="aboutus.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">About Us</a>
+                <a href="aboutus.html" class="highlighted-link font-extrabold transition">About Us</a>
             </nav>
         </div>
     </div>
@@ -207,7 +169,7 @@
     <div id="content-wrapper" class="w-full">
 
         <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <nav class="container mx-auto px-6 py-4 flex flex-wrap justify-between items-center">
                 
                 <div class="flex items-center">
                     <a href="index.html" class="text-3xl font-extrabold tracking-tight">
@@ -229,19 +191,38 @@
 
         <main class="container mx-auto px-6 py-16 flex-1">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-center mb-4 heading-text main-heading-font">
-                Essential Career Resources 💡
+                Who We Are & Our Mission 🎯
             </h1>
             <p class="text-center text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-                Curated links and guides to help you land your dream job, from interview tips to learning roadmaps.
+                We are dedicated to simplifying your career journey by connecting talent with opportunity seamlessly.
             </p>
 
-            <div class="max-w-2xl mx-auto mb-12">
-                <input type="text" id="search-input" placeholder="Search resources, keywords, or topics..." class="w-full px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-white transition" />
-            </div>
+            <section class="container mx-auto px-6 py-6 sm:py-8">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 sm:mb-10 heading-text">Job Portal Statistics</h2>
+                <div id="analytics" class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 text-center">
+                    <div class="bg-blue-600 dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Total Listings</h3>
+                        <p id="total-jobs" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+                    </div>
+                    <div class="bg-purple-600 dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Internships</h3>
+                        <p id="total-internships" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+                    </div>
+                    <div class="bg-indigo-600 dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Hackathons</h3>
+                        <p id="total-hackathons" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+                    </div>
+                    <div class="bg-green-600 dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
+                        <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Resources</h3>
+                        <p id="total-resources" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
+                    </div>
+                </div>
+            </section>
             
-            <div id="resources-list" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mt-12">
                 
-            </div>
+
+            
         </main>
 
         <footer class="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800">
@@ -261,8 +242,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
             authDomain: "job-portal-a5287.firebaseapp.com",
@@ -278,22 +260,54 @@
         const db = getFirestore(app);
         signInAnonymously(auth).catch(console.error);
 
-        // --- DOM Elements ---
-        const resourcesList = document.getElementById('resources-list');
-        const searchInput = document.getElementById('search-input');
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        
-        // --- Sidebar Elements ---
+        // --- DOM Elements for Statistics ---
+        const totalJobsEl = document.getElementById('total-jobs');
+        const totalInternshipsEl = document.getElementById('total-internships');
+        const totalHackathonsEl = document.getElementById('total-hackathons');
+        const totalResourcesEl = document.getElementById('total-resources');
+
+        // --- Sidebar Elements (for toggle logic) ---
         const desktopSidebar = document.getElementById('main-nav-sidebar');
         const desktopSidebarToggle = document.getElementById('main-nav-toggle');
         const desktopSidebarClose = document.getElementById('close-desktop-sidebar');
-        const contentWrapper = document.getElementById('content-wrapper');
         const mobileNavSidebar = document.getElementById('mobile-nav-sidebar');
         const menuToggle = document.getElementById('menu-toggle');
         const closeMobileSidebarBtn = document.getElementById('close-mobile-sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const contentWrapper = document.getElementById('content-wrapper');
         const sidebarWidth = 250;
+
+        // --- DATA QUERIES ---
+        const jobCollection = collection(db, "jobs");
+        const resourceCollection = collection(db, "resources");
+        const hackathonCollection = collection(db, "hackathons");
+        const internshipQuery = query(jobCollection, where("type", "==", "internship"));
+
+        // --- LIVE STATS LOADING FUNCTION ---
+        const loadCounts = () => {
+            // Total Listings (Jobs + Internships)
+            onSnapshot(jobCollection, (snapshot) => {
+                totalJobsEl.textContent = snapshot.size;
+            });
+            
+            // Total Internships (Requires a specific query)
+            onSnapshot(internshipQuery, (snapshot) => {
+                totalInternshipsEl.textContent = snapshot.size;
+            });
+
+            // Total Resources
+            onSnapshot(resourceCollection, (snapshot) => {
+                totalResourcesEl.textContent = snapshot.size;
+            });
+
+            // Total Hackathons
+            onSnapshot(hackathonCollection, (snapshot) => {
+                totalHackathonsEl.textContent = snapshot.size;
+            });
+        };
+
+        // Initialize counts on page load
+        document.addEventListener('DOMContentLoaded', loadCounts);
 
         // --- Sidebar Logic ---
         const openDesktopSidebar = () => {
@@ -331,70 +345,9 @@
         if (closeMobileSidebarBtn) closeMobileSidebarBtn.addEventListener('click', toggleMobileSidebar);
         if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMobileSidebar); 
         
-        // --- Resource Data Loading & Filtering ---
-        const resourcesCollection = collection(db, "resources"); 
-        const resourcesQuery = query(resourcesCollection, orderBy("createdAt", "desc"));
-        let allResources = []; 
-
-        // 1. Real-time Listener
-        onSnapshot(resourcesQuery, (snapshot) => {
-            allResources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            filterAndDisplay(searchInput.value); 
-        });
-
-        // 2. Filtering Logic
-        const filterAndDisplay = (searchTerm = '') => {
-            const term = searchTerm.toLowerCase().trim();
-            
-            let resourcesToDisplay = allResources;
-
-            if (term) {
-                resourcesToDisplay = allResources.filter(resource =>
-                    resource.name.toLowerCase().includes(term) ||
-                    (resource.link && resource.link.toLowerCase().includes(term))
-                );
-            }
-
-            displayResources(resourcesToDisplay);
-        };
-
-        // 3. Display Logic
-        const displayResources = (resourcesToDisplay) => {
-            resourcesList.innerHTML = '';
-            
-            if (resourcesToDisplay.length === 0) {
-                const searchStatus = searchInput.value.trim() ? ` matching "${searchInput.value.trim()}"` : '';
-                resourcesList.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400 col-span-full py-16">No learning resources found${searchStatus}.</p>`;
-                return;
-            }
-
-            resourcesToDisplay.forEach(resource => {
-                const displayLink = resource.link.replace(/^https?:\/\//, '').split('/')[0];
-                
-                resourcesList.innerHTML += `
-                    <a href="${resource.link}" target="_blank" class="resource-card block bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl p-6 border border-purple-200 dark:border-purple-800 transition-all duration-300">
-                        <div class="flex items-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13a2.003 2.003 0 100 3.999 2.003 2.003 0 000-3.999zM21 9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9m18 0a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0h-4.25a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75H21m0-3V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2" />
-                            </svg>
-                            <p class="ml-3 text-xl font-extrabold text-gray-900 dark:text-white leading-tight resource-name">${resource.name}</p>
-                        </div>
-                        <p class="text-xs text-purple-400 font-medium mb-4 truncate">${displayLink}</p>
-                        <span class="w-full text-center bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 font-semibold py-2 px-4 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-700 transition text-sm inline-block">
-                            Access Resource
-                        </span>
-                    </a>
-                `;
-            });
-        };
-
-
-        // --- Event Listeners ---
-        searchInput.addEventListener('input', () => {
-            filterAndDisplay(searchInput.value);
-        });
-        
         // --- THEME TOGGLE LOGIC ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
         const currentTheme = localStorage.getItem('theme');
         if (currentTheme === 'dark') {
             document.body.classList.add('dark');
