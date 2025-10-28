@@ -1,321 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Job Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
-    <style>
-        /* Define Sidebar Width and Content Offset */
-        :root {
-            --sidebar-width: 250px;
-            --sidebar-margin-left: 0px; /* Default margin for content */
-        }
-
-        body { font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
-        
-        /* 🌙 Dark Mode Styles */
-        body.dark { background-color: #0f172a; color: #f1f5f9; }
-        body.dark .job-card { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
-        body.dark footer { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
-        body.dark input { color: white; }
-        body.dark .job-card .description-text { color: white !important; }
-        body.dark .logo-job-text { color: white; }
-        .dashboard-stat-value { color: white !important; }
-        .modal-title-text { color: white !important; }
-        .modal-company-text { color: white !important; }
-        body.dark .modal-company-text { color: #000000 !important; }
-        body.dark .resources-link { color: white !important; }
-        body.dark .modal-description-text { color: white !important; }
-
-        /* Sidebar Theme Consistency */
-        .sidebar-panel { 
-            background-color: white; 
-            border-color: #e5e7eb;
-            color: #1f2937;
-        } 
-        .sidebar-panel .text-gray-700 { color: #374151; }
-        .sidebar-panel .text-gray-600 { color: #4b5563; }
-        
-        body.dark .sidebar-panel { 
-            background-color: #1e293b; 
-            border-color: #334155;
-            color: #f1f5f9;
-        }
-        body.dark .sidebar-panel .text-gray-700,
-        body.dark .sidebar-panel .text-gray-600 {
-             color: #d1d5db;
-        }
-
-        /* 1. PERMANENT LEFT NAVIGATION SIDEBAR (Desktop) */
-        #main-nav-sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            left: 0;
-            top: 0;
-            position: fixed;
-            z-index: 55;
-            padding-top: 1rem;
-            border-right: 1px solid #e5e7eb;
-            
-            /* Hidden by default on desktop */
-            transform: translateX(-100%); 
-            transition: transform 0.3s ease-in-out;
-        }
-        #main-nav-sidebar.open {
-            transform: translateX(0); /* Visible state */
-        }
-        body.dark #main-nav-sidebar {
-            border-right-color: #334155;
-        }
-
-        /* 2. CONTENT WRAPPER (Dynamic Shift) */
-        #content-wrapper {
-            width: 100%;
-            transition: margin-left 0.3s ease-in-out;
-        }
-
-        /* Desktop: Adjust margin based on JS variable */
-        @media (min-width: 1024px) {
-            #content-wrapper {
-                margin-left: var(--sidebar-margin-left);
-                width: calc(100% - var(--sidebar-margin-left));
-            }
-        }
-        
-        /* 3. TOGGLE BUTTON FIX */
-        /* Ensure the toggle button is hidden when the sidebar is open on desktop */
-        #main-nav-toggle.hidden-when-open {
-            display: none !important;
-        }
-        @media (max-width: 1023px) {
-             #main-nav-toggle {
-                display: none !important; /* Hide on mobile */
-            }
-        }
-
-        /* MOBILE-ONLY SLIDING MENU (Hamburger) */
-        #mobile-nav-sidebar {
-            transition: transform 0.3s ease-out;
-            transform: translateX(-100%);
-            z-index: 60; 
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-        }
-        #mobile-nav-sidebar.open {
-            transform: translateX(0);
-        }
-
-                /* Highlighted link text must be visible in both modes */
-        .sidebar-panel .highlighted-link {
-            color: #2563eb !important; /* Blue color for light mode */
-        }
-        body.dark .sidebar-panel .highlighted-link {
-            color: #60a5fa !important; /* Lighter blue for dark mode */
-        }
-        
-        /* Rest of the styles (Tabs, Search container, Checkbox) remain the same */
-        .tab-button { transition: all 0.2s; border-radius: 9999px; padding: 0.75rem 2rem; font-weight: 600; }
-        .tab-button.active { background: linear-gradient(to right, #2563eb, #9333ea); color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
-        .tab-button:not(.active) { background-color: #e5e7eb; color: #1f2937; }
-        body.dark .tab-button:not(.active) { background-color: #374151; color: #f3f4f6; }
-        .search-container { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.25rem; }
-        .search-container > input, .search-container > button { width: 100%; }
-        @media (min-width: 640px) { .search-container { flex-direction: row; gap: 0; } .search-container > input { flex-grow: 1; width: auto; } .search-container > button { width: auto; } }
-        .form-checkbox { appearance: none; -webkit-appearance: none; -moz-appearance: none; height: 1rem; width: 1rem; border: 2px solid currentColor; border-radius: 0.25rem; transition: all 0.2s; }
-        .form-checkbox:checked { background-color: #3b82f6; border-color: #3b82f6; background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.293 6.293a1 1 0 011.414 1.414l-6 6a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L6 10.586l5.293-5.293z'/%3e%3c/svg%3e"); background-size: 1rem 1rem; background-repeat: no-repeat; background-position: center; }
-        body.dark .form-checkbox { border-color: #4b5563; background-color: #1f2937; }
-        body.dark .form-checkbox:checked { background-color: #3b82f6; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    /* Custom keyframes for fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 1.2s ease-out;
+    }
+    /* Modal specific styles */
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    .modal-container {
+      max-width: 640px;
+    }
+    .modal-content {
+      animation: modal-slide-up 0.3s ease-out forwards;
+    }
+    @keyframes modal-slide-up {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <button id="main-nav-toggle" class="hidden lg:flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 shadow-lg text-white hover:bg-blue-700 transition fixed top-24 left-5 z-[100]">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-    </button>
-
-    <nav id="main-nav-sidebar" class="sidebar-panel hidden lg:block">
-        <div class="px-6 pb-6 pt-4">
-            <a href="#" class="text-3xl font-extrabold tracking-tight block mb-8">
-                <span class="logo-job-text text-gray-800">Job</span><span class="text-blue-600">Search</span>
-            </a>
-            
-            <div class="flex flex-col space-y-4 text-lg font-medium">
-                <a href="index.html" class="highlighted-link font-extrabold text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
-                <a href="hackthons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Hackthons</a>
-                <a href="resources.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Resources</a>
-                <a href="Assesment.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assesments</a>
-                <a href="#analytics" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-                <a href="aboutus.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">About Us</a>
-            </div>
-            
-            <button id="close-desktop-sidebar" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
-                &times;
-            </button>
-        </div>
+  <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="text-3xl font-extrabold text-gray-800 tracking-tight">
+        Job<span class="text-blue-600">Search</span>
+      </a>
+      <a href="resources.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition">Resources</a>
     </nav>
-    
-    <div id="mobile-nav-sidebar" class="fixed top-0 left-0 h-full w-64 sidebar-panel lg:hidden">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <a href="#" class="text-2xl font-extrabold">
-                    <span class="logo-job-text">Job</span><span class="text-blue-600">Search</span>
-                </a>
-                <button id="close-mobile-sidebar" class="text-2xl text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
-                    &times;
-                </button>
-            </div>
-            <nav class="flex flex-col space-y-4 text-lg font-medium">
-                <a href="index.html" class="highlighted-link font-extrabold transition text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Home</a>
-                <a href="hackthons.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Hackthons</a>
-                <a href="resources.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Resources</a>
-                <a href="Assesment.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Assesments</a>
-                <a href="index.html#analytics" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Dashboard</a>
-                <a href="aboutus.html" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">About Us</a>
-            </nav>
-        </div>
+  </header>
+
+  <section class="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-24 text-center overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
+          <circle cx="5" cy="5" r="1.5" fill="rgba(255,255,255,0.2)" />
+        </pattern>
+        <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles)" />
+      </svg>
     </div>
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity opacity-0 lg:hidden"></div>
     
-    <div id="content-wrapper" class="w-full">
+    <div class="container mx-auto px-6 relative z-10">
+      <h1 class="text-5xl sm:text-6xl font-extrabold mb-4 animate-fadeIn">
+        Discover Your Dream Career
+      </h1>
+      <p class="text-lg max-w-2xl mx-auto mb-10 opacity-90 leading-relaxed">
+        Explore top job opportunities from trusted companies. Apply instantly with just one click.
+      </p>
+      <div class="max-w-xl mx-auto flex bg-white rounded-full shadow-xl overflow-hidden p-1">
+        <input type="text" id="search-input" placeholder="Search for jobs, companies, or keywords..." class="flex-grow px-6 py-3 text-gray-800 bg-transparent placeholder-gray-400 focus:outline-none" />
+        <button id="search-button" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-8 rounded-full hover:from-blue-700 hover:to-purple-700 transition duration-300 shadow-md">
+          Search
+        </button>
+      </div>
+    </div>
+  </section>
 
-        <header class="w-full bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 transition-all duration-300">
-            <nav class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-                <a href="#" class="text-3xl font-extrabold tracking-tight">
-                    <span class="logo-job-text text-gray-800">Job</span><span class="text-blue-600">Search</span>
-                </a>
+  <main class="container mx-auto px-6 py-16 flex-1">
+    <h2 class="text-4xl font-extrabold text-gray-900 text-center mb-12">Featured Jobs ✨</h2>
+    <div id="job-listings" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      </div>
+  </main>
 
-                <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition">
-                        <span id="theme-icon">🌙</span>
-                    </button>
-                    
-                    <button id="menu-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition lg:hidden">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
-                </div>
-            </nav>
-        </header>
+  <footer class="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800">
+    <div class="container mx-auto px-6">
+      <p>&copy; 2025 JobSearch. All rights reserved.</p>
+    </div>
+  </footer>
 
-        <section class="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-12 sm:py-24 text-center overflow-hidden" id="hero">
-            <div class="absolute inset-0 opacity-20">
-                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                    <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-                        <circle cx="5" cy="5" r="1.5" fill="rgba(255,255,255,0.2)" />
-                    </pattern>
-                    <rect width="100%" height="100%" fill="url(#pattern-circles)" />
-                </svg>
-            </div>
-            <div class="container mx-auto px-6 relative z-10">
-                <h1 class="text-4xl sm:text-6xl font-extrabold mb-4">
-                    Discover Your Dream Career
-                </h1>
-                <p class="text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 opacity-90 leading-relaxed">
-                    Explore top job opportunities from trusted companies. Apply instantly with just one click.
-                </p>
-                <div class="max-w-xl mx-auto">
-                    <div class="flex flex-col sm:flex-row bg-white rounded-xl shadow-xl overflow-hidden p-1">
-                        <input 
-                            type="text" 
-                            id="search-input" 
-                            placeholder="Search for jobs, companies, or keywords..." 
-                            class="flex-grow px-4 py-2 sm:py-3 text-gray-800 bg-transparent placeholder-gray-400 focus:outline-none w-full sm:w-auto" 
-                        />
-                        <button 
-                            id="search-button" 
-                            class="mt-2 sm:mt-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 sm:py-3 px-6 rounded-lg hover:opacity-90 w-full sm:w-auto"
-                        >
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+    <div class="bg-white rounded-3xl shadow-xl p-8 w-full modal-container relative modal-content overflow-y-auto max-h-[90vh]">
+      <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
-        <section class="container mx-auto px-6 pt-6 sm:pt-10 pb-4 text-center">
-            <div class="inline-flex space-x-2 sm:space-x-4 p-1 rounded-full bg-gray-200 dark:bg-gray-700 shadow-inner">
-                <button id="tab-jobs" class="tab-button active text-sm sm:text-base px-6 py-2" data-type="job">
-                    Jobs
-                </button>
-                <button id="tab-internships" class="tab-button text-sm sm:text-base px-6 py-2" data-type="internship">
-                    Internships
-                </button>
-            </div>
-        </section>
-
-        <section class="container mx-auto px-6 py-6 sm:py-8" id="analytics">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 sm:mb-10">Dashboard Analytics</h2>
-            <div id="analytics" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 text-center">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
-                    <h3 class="text-xl sm:text-2xl font-bold text-blue-600 mb-2">Total Listings</h3>
-                    <p id="total-jobs" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
-                    <h3 class="text-xl sm:text-2xl font-bold text-purple-600 mb-2">Companies</h3>
-                    <p id="total-companies" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6">
-                    <h3 class="text-xl sm:text-2xl font-bold text-indigo-600 mb-2">New This Week</h3>
-                    <p id="new-jobs" class="text-2xl sm:text-3xl font-extrabold dashboard-stat-value">0</p>
-                </div>
-            </div>
-        </section>
-
-        <main class="container mx-auto px-6 pb-16 flex-1 lg:grid lg:grid-cols-[280px_1fr] gap-10">
-            
-            <aside id="filter-sidebar" class="lg:block mb-8 lg:mb-0">
-                <div class="sticky top-24 sidebar-panel rounded-2xl shadow-xl p-6 border transition-all duration-300">
-                    <h3 class="text-xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
-                        Filter Results ⚙️
-                    </h3>
-                    
-                    <div class="mb-6">
-                        <label for="filter-location" class="block text-sm font-medium mb-2 text-gray-700">Location</label>
-                        <input type="text" id="filter-location" placeholder="e.g., Remote, New York" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 text-sm" />
-                    </div>
-
-                    <div class="mb-6">
-                        <p class="block text-sm font-medium mb-2 text-gray-700">Employment Type</p>
-                        <div id="filter-employment-types" class="space-y-2">
-                            <label class="flex items-center text-sm text-gray-600">
-                                <input type="checkbox" name="employment-type" value="Full-time" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Full-time
-                            </label>
-                            <label class="flex items-center text-sm text-gray-600">
-                                <input type="checkbox" name="employment-type" value="Part-time" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Part-time
-                            </label>
-                            <label class="flex items-center text-sm text-gray-600">
-                                <input type="checkbox" name="employment-type" value="Contract" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Contract
-                            </label>
-                            <label class="flex items-center text-sm text-gray-600">
-                                <input type="checkbox" name="employment-type" value="Remote" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 mr-2"> Remote
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button id="apply-filters" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">Apply Filters</button>
-                        <button id="reset-filters" class="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm font-semibold">Reset</button>
-                    </div>
-                </div>
-            </aside>
-
-            <div id="job-listings-container" class="lg:col-span-1">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 sm:mb-12" id="listing-title">Featured Jobs ✨</h2>
-                <div id="job-listings" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-2"></div>
-            </div>
-        </main>
-
-        <footer class="bg-gray-900 text-gray-400 py-8 sm:py-10 text-center text-sm border-t border-gray-800" id="footer">
-            <div class="container mx-auto px-6">
-                <p>&copy; 2025 JobSearch. All rights reserved. | Connect with us on 
-                    <a href="https://www.linkedin.com/company/jobsearch16/" target="_blank" class="text-blue-400 hover:text-blue-300 hover:underline font-semibold transition">
-                        LinkedIn
-                    </a>
-                </p>
-            </div>
-        </footer>
-    </div> <div id="job-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 modal-overlay">
+      <div class="flex items-start mb-6">
+        <div id="modal-company-logo" class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-extrabold text-3xl rounded-xl shadow-lg"></div>
+        <div class="ml-6">
+          <h3 id="modal-title" class="text-3xl font-extrabold text-gray-900 mb-1"></h3>
+          <p id="modal-company" class="text-lg text-gray-600 mb-2"></p>
+          <div class="flex items-center text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span id="modal-location" class="font-medium"></span>
+          </div>
         </div>
+      </div>
+      
+      <p id="modal-description" class="text-gray-700 leading-relaxed mb-8 whitespace-pre-wrap"></p>
+      
+      <a id="modal-apply-link" target="_blank" class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-lg hover:opacity-90 transition shadow-lg">
+        Apply Now
+      </a>
+    </div>
+  </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -337,170 +132,80 @@
         const db = getFirestore(app);
         signInAnonymously(auth).catch(console.error);
 
-        // --- DOM Elements ---
-        const jobListings = document.getElementById('job-listings');
-        const totalJobsEl = document.getElementById('total-jobs');
-        const totalCompaniesEl = document.getElementById('total-companies');
-        const newJobsEl = document.getElementById('new-jobs');
-        const listingTitle = document.getElementById('listing-title');
-        const searchInput = document.getElementById('search-input'); 
-        const searchButton = document.getElementById('search-button'); 
-        const tabJobs = document.getElementById('tab-jobs');
-        const tabInternships = document.getElementById('tab-internships');
-        let currentTab = 'job'; 
-        const filterLocationInput = document.getElementById('filter-location');
-        const filterEmploymentCheckboxes = document.querySelectorAll('input[name="employment-type"]');
-        const applyFiltersButton = document.getElementById('apply-filters');
-        const resetFiltersButton = document.getElementById('reset-filters');
-        const jobModal = document.getElementById('job-modal');
-        const closeModalBtn = document.getElementById('close-modal');
+    // --- Search & Display Elements ---
+    const jobListings = document.getElementById('job-listings');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    let allJobs = []; // Array to store all job data for local filtering
+
+    // --- Modal Elements ---
+    const jobModal = document.getElementById('job-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCompany = document.getElementById('modal-company');
+    const modalLocation = document.getElementById('modal-location');
+    const modalDescription = document.getElementById('modal-description');
+    const modalApplyLink = document.getElementById('modal-apply-link');
+    const modalCompanyLogo = document.getElementById('modal-company-logo');
+
+    // Reference to the jobs collection
+    const jobsCollection = collection(db, "jobs");
+    const jobsQuery = query(jobsCollection);
+
+    // Real-time listener to get all jobs and store them locally
+    onSnapshot(jobsQuery, (snapshot) => {
+      allJobs = [];
+      if (snapshot.empty) {
+        jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No jobs available at the moment. Check back later!</p>`;
+      } else {
+        snapshot.forEach(doc => {
+          allJobs.push({ id: doc.id, ...doc.data() });
+        });
+        displayJobs(allJobs);
+      }
+    });
+
+    // Function to filter and display jobs based on the search query
+    const handleSearch = () => {
+      const query = searchInput.value.toLowerCase();
+      const filteredJobs = allJobs.filter(job => {
+        return (
+          job.title.toLowerCase().includes(query) ||
+          job.company.toLowerCase().includes(query) ||
+          job.description.toLowerCase().includes(query) ||
+          job.location.toLowerCase().includes(query)
+        );
+      });
+      displayJobs(filteredJobs);
+    };
+
+    // Function to render job cards to the page (Updated for Posting Time)
+    const displayJobs = (jobsToDisplay) => {
+      jobListings.innerHTML = '';
+      if (jobsToDisplay.length === 0) {
+        jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No jobs match your search criteria.</p>`;
+        return;
+      }
+      
+      const now = new Date().getTime();
+
+      jobsToDisplay.forEach(job => {
+        const firstLetter = job.company ? job.company.charAt(0).toUpperCase() : '?';
         
-        let allJobs = [];
-        let currentFilters = { location: '', employmentTypes: [] };
-        
-        const jobsCollection = collection(db, "jobs");
-        const jobsQuery = query(jobsCollection);
-
-
-        // --- NEW DESKTOP SIDEBAR LOGIC ---
-        const desktopSidebar = document.getElementById('main-nav-sidebar');
-        const desktopSidebarToggle = document.getElementById('main-nav-toggle');
-        const desktopSidebarClose = document.getElementById('close-desktop-sidebar');
-        const contentWrapper = document.getElementById('content-wrapper');
-
-        const sidebarWidth = 250; // Matches CSS --sidebar-width
-
-        const openDesktopSidebar = () => {
-            desktopSidebar.classList.add('open');
-            desktopSidebarToggle.classList.add('hidden-when-open');
-            // This line updates the CSS variable used by #content-wrapper to shift the content
-            document.documentElement.style.setProperty('--sidebar-margin-left', `${sidebarWidth}px`);
-        };
-
-        const closeDesktopSidebar = () => {
-            desktopSidebar.classList.remove('open');
-            desktopSidebarToggle.classList.remove('hidden-when-open');
-            document.documentElement.style.setProperty('--sidebar-margin-left', '0px');
-        };
-
-        // Attach listeners for desktop sidebar actions
-        if (desktopSidebarToggle) desktopSidebarToggle.addEventListener('click', openDesktopSidebar);
-        if (desktopSidebarClose) desktopSidebarClose.addEventListener('click', closeDesktopSidebar);
-        
-        // --- MOBILE SIDEBAR LOGIC (Hamburger) ---
-        const mobileNavSidebar = document.getElementById('mobile-nav-sidebar');
-        const menuToggle = document.getElementById('menu-toggle');
-        const closeMobileSidebarBtn = document.getElementById('close-mobile-sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-
-        const toggleMobileSidebar = () => {
-            const isOpen = mobileNavSidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('hidden', !isOpen);
-            sidebarOverlay.classList.toggle('opacity-0', !isOpen);
-            sidebarOverlay.classList.toggle('opacity-100', isOpen);
-            document.body.style.overflow = isOpen ? 'hidden' : 'auto';
-        };
-
-        if (menuToggle) menuToggle.addEventListener('click', toggleMobileSidebar);
-        if (closeMobileSidebarBtn) closeMobileSidebarBtn.addEventListener('click', toggleMobileSidebar);
-        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMobileSidebar); 
-        
-
-        // --- CORE FUNCTIONALITY (Filter, Display, etc. remains the same) ---
-        
-        const filterAndDisplay = (type, searchTerm = '') => {
-            currentTab = type;
-            const term = searchTerm.toLowerCase().trim();
+        // CALCULATE POSTING TIME STRING
+        let postedText = 'Recently posted';
+        if (job.postedAt && job.postedAt.toDate) {
+            const postedTime = job.postedAt.toDate().getTime();
+            const diffInHours = Math.floor((now - postedTime) / (1000 * 60 * 60));
             
-            let filteredJobs = allJobs.filter(job => job.type ? job.type.toLowerCase() === type : type === 'job');
-
-            filteredJobs = filteredJobs.filter(job => {
-                const locationTerm = currentFilters.location.toLowerCase();
-                const locationMatch = !locationTerm || job.location.toLowerCase().includes(locationTerm);
-                let employmentMatch = true;
-                if (currentFilters.employmentTypes.length > 0) {
-                    const jobEmploymentType = (job.employmentType || 'Full-time').toLowerCase(); 
-                    const isRemoteJob = job.location.toLowerCase().includes('remote');
-                    const hasRemoteFilter = currentFilters.employmentTypes.includes('Remote');
-                    
-                    if (currentFilters.employmentTypes.length === 1 && hasRemoteFilter) { employmentMatch = isRemoteJob; } 
-                    else if (hasRemoteFilter) {
-                        const nonRemoteFilters = currentFilters.employmentTypes.filter(t => t !== 'Remote').map(t => t.toLowerCase());
-                        const typeMatch = nonRemoteFilters.length === 0 || nonRemoteFilters.includes(jobEmploymentType);
-                        employmentMatch = typeMatch && isRemoteJob;
-                    } else {
-                        employmentMatch = currentFilters.employmentTypes.map(t => t.toLowerCase()).includes(jobEmploymentType);
-                    }
-                }
-                return locationMatch && employmentMatch;
-            });
-
-            if (term) {
-                filteredJobs = filteredJobs.filter(job =>
-                    job.title.toLowerCase().includes(term) || job.company.toLowerCase().includes(term) ||
-                    job.location.toLowerCase().includes(term) || job.description.toLowerCase().includes(term)
-                );
-            }
-
-            updateTabStyles(type);
-            displayJobs(filteredJobs);
-            updateAnalytics(filteredJobs);
-        };
-
-        onSnapshot(jobsQuery, (snapshot) => {
-            allJobs = [];
-            snapshot.forEach(doc => allJobs.push({ id: doc.id, ...doc.data() }));
-            filterAndDisplay(currentTab, searchInput.value);
-        });
-
-        tabJobs.addEventListener('click', () => filterAndDisplay('job', searchInput.value));
-        tabInternships.addEventListener('click', () => filterAndDisplay('internship', searchInput.value));
-
-        const runSearch = () => { filterAndDisplay(currentTab, searchInput.value); };
-        searchButton.addEventListener('click', runSearch);
-        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { runSearch(); } });
-        
-        applyFiltersButton.addEventListener('click', () => {
-            currentFilters.location = filterLocationInput.value.trim();
-            currentFilters.employmentTypes = Array.from(filterEmploymentCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
-            filterAndDisplay(currentTab, searchInput.value);
-        });
-
-        resetFiltersButton.addEventListener('click', () => {
-            filterLocationInput.value = '';
-            filterEmploymentCheckboxes.forEach(cb => cb.checked = false);
-            currentFilters = { location: '', employmentTypes: [] };
-            filterAndDisplay(currentTab, searchInput.value);
-        });
-        
-        const updateTabStyles = (type) => {
-            tabJobs.classList.remove('active');
-            tabInternships.classList.remove('active');
-            if (type === 'job') {
-                tabJobs.classList.add('active');
-                listingTitle.textContent = "Featured Jobs ✨";
+            if (diffInHours < 24) {
+                postedText = diffInHours === 0 ? 'Posted today' : `${diffInHours} hours ago`;
             } else {
-                tabInternships.classList.add('active');
-                listingTitle.textContent = "Featured Internships 🚀";
+                const diffInDays = Math.floor(diffInHours / 24);
+                postedText = `${diffInDays} days ago`;
             }
-        };
-
-        const displayJobs = (jobs) => {
-            jobListings.innerHTML = '';
-            if (!jobs.length) {
-                const searchStatus = searchInput.value.trim() ? ` for "${searchInput.value.trim()}"` : '';
-                jobListings.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No ${currentTab} listings found${searchStatus}.</p>`;
-                return;
-            }
-
-            const now = Date.now();
-            jobs.forEach(job => {
-                const firstLetter = job.company?.[0]?.toUpperCase() || '?';
-                let postedText = 'Recently posted';
-                if (job.postedAt?.toDate) {
-                    const diffHours = Math.floor((now - job.postedAt.toDate().getTime()) / 3600000);
-                    postedText = diffHours < 24 ? `${diffHours} hrs ago` : `${Math.floor(diffHours / 24)} days ago`;
-                }
+        }
+        // END CALCULATE POSTING TIME STRING
 
                 jobListings.innerHTML += `
                     <div class="job-card bg-white rounded-3xl shadow-xl hover:shadow-2xl p-8 border border-gray-200 transition-all duration-300 transform hover:-translate-y-2 flex flex-col cursor-pointer" data-doc-id="${job.id}">
@@ -523,31 +228,64 @@
             });
         };
 
-        const updateAnalytics = (jobs) => {
-            const companies = new Set(jobs.map(j => j.company));
-            const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-            const newJobs = allJobs.filter(j => j.postedAt?.toDate && (Date.now() - j.postedAt.toDate().getTime()) < oneWeekInMs);
-            totalJobsEl.textContent = jobs.length;
-            totalCompaniesEl.textContent = companies.size;
-            newJobsEl.textContent = newJobs.length;
-        };
+    // --- Event Listeners ---
 
-        // (Modal functions abbreviated)
-        
-        // 🌗 Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') {
-            document.body.classList.add('dark');
-            themeIcon.textContent = '☀️';
+    // Search bar functionality
+    searchButton.addEventListener('click', handleSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    });
+
+    // Event delegation to open the modal
+    jobListings.addEventListener('click', (event) => {
+      const card = event.target.closest('.job-card');
+      if (card) {
+        const docId = card.dataset.docId;
+        const job = allJobs.find(j => j.id === docId); // Find the job from the local array
+        if (job) {
+          populateModal(job);
+          showModal();
         }
-        themeToggle.onclick = () => {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeIcon.textContent = isDark ? '☀️' : '🌙';
-        };
-    </script>   
+      }
+    });
+
+    // Populate modal with job data
+    const populateModal = (job) => {
+      const firstLetter = job.company ? job.company.charAt(0).toUpperCase() : '?';
+      modalCompanyLogo.textContent = firstLetter;
+      modalTitle.textContent = job.title;
+      modalCompany.textContent = job.company;
+      modalLocation.textContent = job.location;
+      modalDescription.textContent = job.description;
+      modalApplyLink.href = job.applyLink;
+    };
+
+    // Show the modal
+    const showModal = () => {
+      jobModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Hide the modal
+    const hideModal = () => {
+      jobModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    };
+
+    // Event listeners to close the modal
+    closeModalBtn.addEventListener('click', hideModal);
+    jobModal.addEventListener('click', (e) => {
+      if (e.target === jobModal) {
+        hideModal();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideModal();
+      }
+    });
+  </script>
 </body>
 </html>
