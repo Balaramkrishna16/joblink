@@ -1,331 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Panel - JobSearch</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(110deg, #1d4ed8 0%, #4338ca 70%, #6d28d9 100%);
-      min-height: 100vh;
-    }
-    .glass {
-      background: rgba(255,255,255,0.30);
-      border: 2px solid rgba(255,255,255,0.18);
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22);
-    }
-    input, textarea {
-      border: 2px solid #a5b4fc;
-      transition: border 0.2s, box-shadow 0.2s;
-    }
-    input:focus, textarea:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px #c7d2fe;
-    }
-    button {
-      transition: box-shadow 0.2s, transform 0.1s;
-      box-shadow: 0 2px 8px rgba(67,56,202,0.12);
-    }
-    button:hover {
-      transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 6px 16px rgba(99,102,241,0.18);
-    }
-    ::selection {
-      background: #a5b4fc;
-      color: #312e81;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Panel - JobSearch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Apply background gradient directly to the visible body area */
+            background: linear-gradient(110deg, #1d4ed8 0%, #4338ca 70%, #6d28d9 100%);
+            min-height: 100vh;
+            display: flex; /* Helps center the login screen before dashboard loads */
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Dashboard Container takes up the full screen when visible */
+        #dashboard-container {
+            width: 100%;
+            min-height: 100vh;
+            /* Override the body background for the dashboard view */
+            background-color: #f8fafc; 
+            display: none; /* Hidden by default */
+        }
+        
+        /* Ensure the login screen is visible and centered */
+        #login-screen {
+            position: absolute; /* Allows centering over the gradient body background */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.30);
+            border: 2px solid rgba(255,255,255,0.18);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22);
+        }
+        input, textarea, select {
+            border: 2px solid #a5b4fc;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px #c7d2fe;
+        }
+        button {
+            transition: box-shadow 0.2s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(67,56,202,0.12);
+        }
+        button:hover {
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 6px 16px rgba(99,102,241,0.18);
+        }
+        ::selection {
+            background: #a5b4fc;
+            color: #312e81;
+        }
+
+        /* --- Styling for Admin Sections --- */
+        .card-admin {
+            background-color: white;
+            border: 1px solid #e0e7ff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* --- Sidebar Navigation Style --- */
+        .nav-button {
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            padding: 0.75rem 1.25rem; 
+            border-radius: 0.75rem; 
+            font-weight: 600; 
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .nav-button:hover {
+            background-color: #e0e7ff; /* indigo-100 */
+            transform: none;
+            box-shadow: none;
+        }
+        .nav-button.active {
+            background-color: #c7d2fe; /* indigo-200 */
+            color: #4338ca; /* indigo-700 */
+            box-shadow: none;
+            transform: none;
+        }
+        .nav-button.text-indigo-700 { color: #4338ca; }
+    </style>
 </head>
 <body>
 
-  <div id="login-screen" class="w-full max-w-md glass rounded-3xl p-10 text-white shadow-2xl border border-blue-300/50 mx-auto mt-20">
-    <h2 class="text-4xl font-extrabold text-center mb-8 tracking-tighter">Job<span class="text-blue-200">Search</span> Admin</h2>
-    <form id="login-form" class="space-y-6">
-      <input type="email" id="email" placeholder="Email" class="w-full px-5 py-4 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-blue-400 border transition" required />
-      <input type="password" id="password" placeholder="Password" class="w-full px-5 py-4 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-blue-400 border transition" required />
-      <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-800 text-white text-xl font-semibold hover:opacity-95 transition">Login</button>
-    </form>
-    <p id="login-error" class="text-red-300 text-sm mt-4 text-center hidden"></p>
-  </div>
-
-  <div id="dashboard" class="hidden w-full min-h-screen flex flex-col">
-
-    <header class="flex items-center justify-between px-10 py-5 bg-white shadow-lg border-b border-gray-200">
-      <h1 class="text-3xl font-extrabold text-indigo-800">Job<span class="text-blue-600">Search</span> Admin</h1>
-      <div class="flex items-center space-x-6">
-        <span class="text-gray-700 font-medium">Welcome, Admin</span>
-        <button onclick="logout()" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition">
-          Logout
-        </button>
-      </div>
-    </header>
-
-    <div class="flex flex-1 overflow-hidden">
-      <aside class="w-72 bg-white shadow-inner border-r border-gray-200 p-8 flex flex-col space-y-4">
-        <button onclick="showSection('resources')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13a2.003 2.003 0 100 3.999 2.003 2.003 0 000-3.999zm0 0h.01a2.003 2.003 0 110 3.999 2.003 2.003 0 010-3.999zM21 9h-4.25a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75H21a.75.75 0 00.75-.75v-1.5a.75.75 0 00-.75-.75zM3 9h4.25a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75H3A.75.75 0 012.25 11.25v-1.5A.75.75 0 013 9z" /></svg>
-          All Resources
-        </button>
-        <button onclick="showSection('add-resource')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-          Add New Resource
-        </button>
-        <button onclick="showSection('jobs')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-          All Jobs
-        </button>
-        <button onclick="showSection('add-job')" class="flex items-center gap-4 px-5 py-4 rounded-xl text-indigo-700 font-semibold text-lg hover:bg-indigo-100 transition focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-          Add New Job
-        </button>
-      </aside>
-
-      <main class="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-10 overflow-auto rounded-tr-3xl">
-
-        <section id="resources-section" class="hidden">
-          <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">All Resources</h2>
-          <div id="resources-list" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-             </div>
-        </section>
-
-        <section id="add-resource-section" class="hidden max-w-xl">
-          <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Resource</h2>
-          <form id="add-resource-form" class="space-y-8 p-8 bg-white rounded-3xl shadow-xl border border-indigo-200">
-            <input type="text" id="resource-name" placeholder="Resource Name (e.g., Ultimate JS Cheatsheet)" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <input type="url" id="resource-link" placeholder="Direct Drive/File Link (Must be a URL)" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-700 to-indigo-700 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Resource</button>
-          </form>
-        </section>
-
-        <section id="jobs-section" class="hidden">
-          <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">All Job Listings</h2>
-          <div id="jobs-list" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3"></div>
-        </section>
-
-        <section id="add-job-section" class="hidden max-w-xl">
-          <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Job</h2>
-          <form id="add-job-form" class="space-y-8 p-8 bg-white rounded-3xl shadow-xl border border-indigo-200">
-            <input type="text" id="job-title" placeholder="Job Title" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <input type="text" id="job-company" placeholder="Company Name" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <textarea id="job-description" placeholder="Job Description" rows="6" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required></textarea>
-            <input type="text" id="job-location" placeholder="Location" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <input type="text" id="job-link" placeholder="Apply Link" class="w-full px-5 py-4 rounded-xl border border-indigo-300 focus:ring-4 focus:ring-indigo-400 focus:outline-none" required />
-            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-700 to-indigo-700 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Job</button>
-          </form>
-        </section>
-      </main>
+    <div id="login-screen" class="w-full max-w-md glass rounded-3xl p-10 text-white shadow-2xl border border-blue-300/50">
+        <h2 class="text-4xl font-extrabold text-center mb-8 tracking-tighter">Job<span class="text-blue-200">Search</span> Admin</h2>
+        <form id="login-form" class="space-y-6">
+            <input type="email" id="email" placeholder="Email" class="w-full px-5 py-4 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-blue-400 border transition" required />
+            <input type="password" id="password" placeholder="Password" class="w-full px-5 py-4 rounded-xl text-gray-800 bg-white/80 focus:bg-white/95 focus:ring-2 focus:ring-blue-400 border transition" required />
+            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-800 text-white text-xl font-semibold hover:opacity-95 transition">Login</button>
+        </form>
+        <p id="login-error" class="text-red-300 text-sm mt-4 text-center hidden"></p>
     </div>
-  </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    // ADDED Timestamp import
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, Timestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <div id="dashboard-container" class="w-full min-h-screen flex flex-col">
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
-      authDomain: "job-portal-a5287.firebaseapp.com",
-      projectId: "job-portal-a5287",
-      storageBucket: "job-portal-a5287.firebasestorage.app",
-      messagingSenderId: "662364695020",
-      appId: "1:662364695020:web:c609a35f35066c9d21b8c9",
-      measurementId: "G-NWGMC1TC1K"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const loginScreen = document.getElementById('login-screen');
-    const dashboard = document.getElementById('dashboard');
-    const loginForm = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
-    const jobsList = document.getElementById('jobs-list');
-    const resourcesList = document.getElementById('resources-list'); 
-    const addResourceForm = document.getElementById('add-resource-form');
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (error) {
-        loginError.textContent = "Invalid credentials. Try again.";
-        loginError.classList.remove("hidden");
-      }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginScreen.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        showSection('resources'); // Default to resources on login
-        loadResources();
-        loadJobs();
-      } else {
-        loginScreen.classList.remove('hidden');
-        dashboard.classList.add('hidden');
-      }
-    });
-    
-    // --- Job Management ---
-    document.getElementById('add-job-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const job = {
-        title: document.getElementById('job-title').value,
-        company: document.getElementById('job-company').value,
-        description: document.getElementById('job-description').value,
-        location: document.getElementById('job-location').value,
-        applyLink: document.getElementById('job-link').value,
-        // ADDED: Timestamp for automatic deletion
-        postedAt: Timestamp.now() 
-      };
-      await addDoc(collection(db, "jobs"), job);
-      alert("Job added successfully!");
-      e.target.reset();
-      showSection('jobs');
-      loadJobs();
-    });
-
-    async function loadJobs() {
-      jobsList.innerHTML = '';
-      
-      const jobsCollectionRef = collection(db, "jobs");
-      const querySnapshot = await getDocs(jobsCollectionRef);
-      
-      const now = new Date().getTime();
-      const twentyDaysInMs = 20 * 24 * 60 * 60 * 1000;
-      let jobsDeleted = false;
-
-      // Filter and Delete Expired Jobs
-      const activeJobs = [];
-      const jobsToDelete = [];
-
-      querySnapshot.forEach((docSnap) => {
-          const job = docSnap.data();
-          const postedTime = job.postedAt ? job.postedAt.toDate().getTime() : 0;
-          
-          if (now - postedTime > twentyDaysInMs) {
-              jobsToDelete.push(docSnap.id);
-              jobsDeleted = true;
-          } else {
-              activeJobs.push({ id: docSnap.id, ...job });
-          }
-      });
-      
-      // Perform Deletion of Expired Jobs
-      for (const id of jobsToDelete) {
-          await deleteDoc(doc(db, "jobs", id));
-      }
-
-      // If jobs were deleted, reload to reflect accurate count, otherwise continue
-      if (jobsDeleted) {
-          console.log(`Deleted ${jobsToDelete.length} expired jobs.`);
-          // If deletion occurred, we reload the function to be safe, 
-          // although 'activeJobs' is technically correct, reloading ensures consistency.
-          return loadJobs(); 
-      }
-
-      // Display Active Jobs
-      if (activeJobs.length === 0) {
-        jobsList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No jobs available to manage.</p>`;
-        return;
-      }
-      
-      activeJobs.forEach((job) => {
-        const postedDate = job.postedAt ? job.postedAt.toDate().toLocaleDateString() : 'N/A';
-
-        jobsList.innerHTML += `
-          <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col border border-indigo-200 hover:shadow-2xl transition">
-            <h3 class="text-2xl font-bold text-indigo-800 mb-2">${job.title}</h3>
-            <p class="text-base text-gray-600 mb-2">${job.company}</p>
-            <p class="text-sm text-gray-500 mb-2">Posted: ${postedDate}</p>
-            <p class="text-gray-700 flex-grow mb-4">${job.description.slice(0, 100)}...</p>
-            <p class="text-sm text-indigo-600 mb-4 font-semibold">${job.location}</p>
-            <div class="flex justify-between items-center gap-4">
-              <a href="${job.applyLink}" target="_blank" class="bg-indigo-100 text-indigo-700 px-5 py-2 rounded-lg hover:bg-indigo-200 font-semibold transition">View</a>
-              <button onclick="deleteJob('${job.id}')" class="bg-red-100 text-red-700 px-5 py-2 rounded-lg hover:bg-red-200 font-semibold transition">Delete</button>
+        <header class="flex items-center justify-between px-10 py-5 bg-white shadow-lg border-b border-gray-200 sticky top-0 z-40">
+            <h1 class="text-3xl font-extrabold text-indigo-800">Job<span class="text-blue-600">Search</span> Admin</h1>
+            <div class="flex items-center space-x-6">
+                <span class="text-gray-700 font-medium" id="welcome-user">Welcome, Guest</span>
+                <button onclick="logout()" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition shadow-md">
+                    Logout
+                </button>
             </div>
-          </div>
-        `;
-      });
-    }
+        </header>
 
-    window.deleteJob = async (id) => {
-      if (confirm("Are you sure you want to delete this job?")) {
-        await deleteDoc(doc(db, "jobs", id));
-        loadJobs();
-      }
-    };
+        <div class="flex flex-1 overflow-hidden">
+            <aside class="w-72 bg-white shadow-inner border-r border-gray-200 p-6 flex flex-col space-y-4 hidden lg:flex">
+                <button onclick="showSection('resources')" id="nav-resources" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13a2.003 2.003 0 100 3.999 2.003 2.003 0 000-3.999zm0 0h.01a2.003 2.003 0 110 3.999 2.003 2.003 0 010-3.999zM21 9h-4.25a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75H21a.75.75 0 00.75-.75v-1.5a.75.75 0 00-.75-.75zM3 9h4.25a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75H3A.75.75 0 012.25 11.25v-1.5A.75.75 0 013 9z" /></svg>
+                    All Resources
+                </button>
+                <button onclick="showSection('add-resource')" id="nav-add-resource" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    Add Resource
+                </button>
+                <button onclick="showSection('jobs')" id="nav-jobs" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Job Listings
+                </button>
+                <button onclick="showSection('add-job')" id="nav-add-job" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    Add New Job
+                </button>
+                <button onclick="showSection('add-internship')" id="nav-add-internship" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Add Internship
+                </button>
 
-    // --- Resource Management (No changes needed for 20-day rule here) ---
+                <button onclick="showSection('hackathons')" id="nav-hackathons" class="nav-button text-indigo-700 hover:bg-indigo-100 font-semibold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.567 23.567 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 14v4m-8-4v4m-4-4h16m-4 4h.01M8 12h.01M16 12h.01M12 16h.01M12 8h.01M12 4v16" /></svg>
+                    Manage Hackathons
+                </button>
+            </aside>
 
-    addResourceForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const resource = {
-        name: document.getElementById('resource-name').value,
-        link: document.getElementById('resource-link').value,
-        createdAt: new Date().toISOString()
-      };
-      await addDoc(collection(db, "resources"), resource);
-      alert("Resource added successfully!");
-      e.target.reset();
-      showSection('resources');
-      loadResources();
-    });
+            <main class="flex-1 p-10 overflow-auto">
 
-    async function loadResources() {
-      resourcesList.innerHTML = '';
-      const querySnapshot = await getDocs(collection(db, "resources"));
-      if (querySnapshot.empty) {
-        resourcesList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No resources available to manage.</p>`;
-        return;
-      }
-      querySnapshot.forEach((docSnap) => {
-        const resource = docSnap.data();
-        resourcesList.innerHTML += `
-          <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col border border-purple-200 hover:shadow-2xl transition">
-            <h3 class="text-2xl font-bold text-purple-800 mb-2">${resource.name}</h3>
-            <p class="text-sm text-gray-500 mb-4">Link: <a href="${resource.link}" target="_blank" class="text-blue-500 hover:underline">View</a></p>
-            <div class="flex justify-between items-center gap-4 mt-auto">
-              <a href="${resource.link}" target="_blank" class="bg-purple-100 text-purple-700 px-5 py-2 rounded-lg hover:bg-purple-200 font-semibold transition">Open Link</a>
-              <button onclick="deleteResource('${docSnap.id}')" class="bg-red-100 text-red-700 px-5 py-2 rounded-lg hover:bg-red-200 font-semibold transition">Delete</button>
-            </div>
-          </div>
-        `;
-      });
-    }
+                <section id="resources-section">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">All Resources</h2>
+                    <div id="resources-list" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                        </div>
+                </section>
 
-    window.deleteResource = async (id) => {
-      if (confirm("Are you sure you want to delete this resource?")) {
-        await deleteDoc(doc(db, "resources", id));
-        loadResources();
-      }
-    };
+                <section id="add-resource-section" class="hidden max-w-xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Resource</h2>
+                    <form id="add-resource-form" class="space-y-6 p-8 card-admin rounded-3xl shadow-xl border border-indigo-200">
+                        <input type="text" id="resource-name" placeholder="Resource Name (e.g., Ultimate JS Cheatsheet)" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="url" id="resource-link" placeholder="Direct Drive/File Link (Must be a URL)" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Resource</button>
+                    </form>
+                </section>
 
-    // --- Utility Functions ---
-    window.showSection = (section) => {
-      document.getElementById('jobs-section').classList.add('hidden');
-      document.getElementById('add-job-section').classList.add('hidden');
-      document.getElementById('resources-section').classList.add('hidden');
-      document.getElementById('add-resource-section').classList.add('hidden');
-      
-      document.getElementById(`${section}-section`).classList.remove('hidden');
+                <section id="jobs-section" class="hidden">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide" id="listing-title">All Job & Internship Listings</h2>
+                    <div id="jobs-list" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                        </div>
+                </section>
 
-      if (section === 'jobs') loadJobs();
-      if (section === 'resources') loadResources();
-    };
+                <section id="add-job-section" class="hidden max-w-xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Job</h2>
+                    <form id="add-job-form" class="space-y-6 p-8 card-admin rounded-3xl shadow-xl border border-indigo-200">
+                        <input type="text" id="job-title" placeholder="Job Title" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="text" id="job-company" placeholder="Company Name" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="hidden" id="job-type-hidden" value="job">
+                        <textarea id="job-description" placeholder="Job Description" rows="4" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required></textarea>
+                        <input type="text" id="job-location" placeholder="Location" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="url" id="job-link" placeholder="Apply Link" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Job Listing</button>
+                    </form>
+                </section>
 
-    window.logout = () => {
-      signOut(auth);
-    };
-  </script>
+                <section id="add-internship-section" class="hidden max-w-xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Internship</h2>
+                    <form id="add-internship-form" class="space-y-6 p-8 card-admin rounded-3xl shadow-xl border border-indigo-200">
+                        <input type="text" id="internship-title" placeholder="Internship Title" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="text" id="internship-company" placeholder="Company Name" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="hidden" id="internship-type-hidden" value="internship"> 
+                        <textarea id="internship-description" placeholder="Internship Description" rows="4" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required></textarea>
+                        <input type="text" id="internship-location" placeholder="Location" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="url" id="internship-link" placeholder="Apply Link URL" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Internship Listing</button>
+                    </form>
+                </section>
+
+                <section id="hackathons-section" class="hidden">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Manage Hackathons</h2>
+                    
+                    <div class="mb-8">
+                        <button onclick="showSection('add-hackathon')" class="nav-button bg-indigo-500 text-white hover:bg-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            Add New Hackathon
+                        </button>
+                    </div>
+
+                    <div id="hackathons-list" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="text-center text-gray-500 col-span-full py-12">Loading Hackathon Data...</div>
+                    </div>
+                </section>
+
+                <section id="add-hackathon-section" class="hidden max-w-xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-indigo-800 mb-10 tracking-wide">Add New Hackathon</h2>
+                    <form id="add-hackathon-form" class="space-y-6 p-8 card-admin rounded-3xl shadow-xl border border-indigo-200">
+                        <input type="text" id="hackathon-name" placeholder="Hackathon Name" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="text" id="hackathon-location" placeholder="Location (e.g., Virtual, New York)" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="text" id="hackathon-duration" placeholder="Duration (e.g., 48 Hrs)" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <input type="url" id="hackathon-link" placeholder="Registration/Event Link" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        <textarea id="hackathon-description" placeholder="Short Description" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required></textarea>
+                        <input type="text" id="hackathon-tags" placeholder="Tags (e.g., AI, Web3, Frontend)" class="w-full px-5 py-4 rounded-xl bg-gray-50 text-gray-800" required />
+                        
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg hover:opacity-95 transition shadow-lg">Add Hackathon</button>
+                    </form>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 text-center text-sm border-t border-gray-800 hidden">
+        <div class="container mx-auto px-6">
+            <p>&copy; 2025 JobSearch. All rights reserved. | Connect with us on 
+                <a href="https://www.linkedin.com/company/jobsearch16/" target="_blank" class="text-blue-400 hover:text-blue-300 hover:underline font-semibold transition">
+                    LinkedIn
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, Timestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Initialization ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBms7RUKhR0KfxlWF0oPOmIto9c6inH2u0",
+            authDomain: "job-portal-a5287.firebaseapp.com",
+            projectId: "job-portal-a5287",
+            storageBucket: "job-portal-a5287.firebasestorage.app",
+            messagingSenderId: "662364695020",
+            appId: "1:662364695020:web:c609a35f35066c9d21b8c9",
+            measurementId: "G-NWGMC1TC1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // --- DOM Elements ---
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardContainer = document.getElementById('dashboard-container'); // Corrected ID
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const welcomeUser = document.getElementById('welcome-user');
+        
+        const jobsList = document.getElementById('jobs-list');
+        const resourcesList = document.getElementById('resources-list'); 
+        const hackathonsList = document.getElementById('hackathons-list');
+        
+        const addResourceForm = document.getElementById('add-resource-form');
+        const addJobForm = document.getElementById('add-job-form');
+        const addInternshipForm = document.getElementById('add-internship-form');
+        const addHackathonForm = document.getElementById('add-hackathon-form');
+
+        // --- AUTHENTICATION ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError.textContent = "Invalid credentials. Try again.";
+                loginError.classList.remove("hidden");
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Show Dashboard
+                loginScreen.style.display = 'none'; // Hide login with style property
+                dashboardContainer.style.display = 'flex'; // Show dashboard with flex
+                
+                welcomeUser.textContent = `Welcome, ${user.email ? user.email.split('@')[0] : 'Admin'}`;
+                showSection('resources'); // Default to resources on login
+            } else {
+                // Show Login Screen
+                dashboardContainer.style.display = 'none';
+                loginScreen.style.display = 'block'; 
+            }
+        });
+        
+        window.logout = () => { signOut(auth); };
+        
+        // --- SECTION NAVIGATION ---
+        window.showSection = (section) => {
+            // 1. Hide all sections
+            document.querySelectorAll('#dashboard-container main section').forEach(sec => sec.classList.add('hidden'));
+            
+            // 2. Deactivate all nav buttons
+            document.querySelectorAll('#dashboard-container aside button').forEach(btn => btn.classList.remove('active'));
+            
+            // 3. Show the requested section and activate the corresponding nav button
+            document.getElementById(`${section}-section`)?.classList.remove('hidden');
+            document.getElementById(`nav-${section}`)?.classList.add('active');
+
+            // 4. Load data for specific sections
+            if (section === 'jobs') loadJobsAndInternships(); 
+            if (section === 'resources') loadResources();
+            if (section === 'hackathons') loadHackathons();
+        };
+
+        // --- JOB/INTERNSHIP MANAGEMENT ---
+        async function loadJobsAndInternships() {
+            jobsList.innerHTML = '<div class="text-center text-gray-500 col-span-full py-12">Loading Jobs...</div>';
+            const jobsCollectionRef = collection(db, "jobs");
+            const querySnapshot = await getDocs(jobsCollectionRef);
+            
+            jobsList.innerHTML = '';
+            if (querySnapshot.empty) {
+                jobsList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No job or internship listings available to manage.</p>`;
+                return;
+            }
+            
+            querySnapshot.forEach((docSnap) => {
+                const job = docSnap.data();
+                const typeTag = job.type ? job.type.toUpperCase() : 'JOB'; 
+                const postedDate = job.postedAt ? job.postedAt.toDate().toLocaleDateString() : 'N/A';
+                
+                jobsList.innerHTML += `
+                    <div class="card-admin rounded-2xl p-6 flex flex-col border border-indigo-200 hover:shadow-xl transition">
+                        <h3 class="text-xl font-bold text-indigo-800 mb-2">${job.title}</h3>
+                        <p class="text-sm text-gray-600 mb-1">${job.company} <span class="text-xs font-bold text-blue-500">(${typeTag})</span></p>
+                        <p class="text-xs text-gray-500 mb-3">Posted: ${postedDate}</p>
+                        <p class="text-gray-700 flex-grow mb-4 text-sm">${job.description.slice(0, 100)}...</p>
+                        <p class="text-xs text-indigo-600 mb-4 font-semibold">${job.location}</p>
+                        <div class="flex justify-between items-center gap-4">
+                            <a href="${job.applyLink}" target="_blank" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-200 font-semibold transition text-sm flex-grow text-center">View</a>
+                            <button onclick="deleteJob('${docSnap.id}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 font-semibold transition text-sm">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.deleteJob = async (id) => {
+            if (confirm("Are you sure you want to delete this listing?")) {
+                await deleteDoc(doc(db, "jobs", id));
+                loadJobsAndInternships();
+            }
+        };
+        
+        const handleAddListing = async (e, type) => {
+            e.preventDefault();
+            const typePrefix = type === 'job' ? 'job' : 'internship';
+            const form = e.target;
+
+            const listingData = {
+                title: form.querySelector(`#${typePrefix}-title`).value,
+                company: form.querySelector(`#${typePrefix}-company`).value,
+                description: form.querySelector(`#${typePrefix}-description`).value,
+                location: form.querySelector(`#${typePrefix}-location`).value,
+                applyLink: form.querySelector(`#${typePrefix}-link`).value,
+                type: type,
+                postedAt: Timestamp.now() 
+            };
+            
+            await addDoc(collection(db, "jobs"), listingData);
+            alert(`${type.toUpperCase()} added successfully!`);
+            form.reset();
+            showSection('jobs'); 
+        }
+
+        addJobForm.addEventListener('submit', (e) => handleAddListing(e, 'job'));
+        addInternshipForm.addEventListener('submit', (e) => handleAddListing(e, 'internship'));
+
+        // --- RESOURCE MANAGEMENT ---
+        addResourceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resource = {
+                name: document.getElementById('resource-name').value,
+                link: document.getElementById('resource-link').value,
+                createdAt: Timestamp.fromDate(new Date())
+            };
+            await addDoc(collection(db, "resources"), resource);
+            alert("Resource added successfully!");
+            e.target.reset();
+            showSection('resources');
+        });
+
+        async function loadResources() {
+            resourcesList.innerHTML = '<div class="text-center text-gray-500 col-span-full py-12">Loading Resources...</div>';
+            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            resourcesList.innerHTML = '';
+            if (querySnapshot.empty) {
+                resourcesList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No resources available to manage.</p>`;
+                return;
+            }
+            querySnapshot.forEach((docSnap) => {
+                const resource = docSnap.data();
+                const displayLink = resource.link.replace(/^https?:\/\//, '').split('/')[0];
+                
+                resourcesList.innerHTML += `
+                    <div class="card-admin rounded-2xl p-6 flex flex-col border border-purple-200 hover:shadow-xl transition">
+                        <h3 class="text-xl font-bold text-purple-800 mb-2">${resource.name}</h3>
+                        <p class="text-sm text-gray-500 mb-4">Link: <a href="${resource.link}" target="_blank" class="text-blue-600 hover:underline">${displayLink.substring(0, 30)}...</a></p>
+                        <div class="flex justify-between items-center gap-4 mt-auto">
+                            <a href="${resource.link}" target="_blank" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 font-semibold transition text-sm flex-grow text-center">Open Link</a>
+                            <button onclick="deleteResource('${docSnap.id}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 font-semibold transition text-sm">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.deleteResource = async (id) => {
+            if (confirm("Are you sure you want to delete this resource?")) {
+                await deleteDoc(doc(db, "resources", id));
+                loadResources();
+            }
+        };
+
+
+        // --- HACKATHON MANAGEMENT ---
+        
+        addHackathonForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hackathonData = {
+                name: document.getElementById('hackathon-name').value,
+                location: document.getElementById('hackathon-location').value,
+                duration: document.getElementById('hackathon-duration').value,
+                link: document.getElementById('hackathon-link').value,
+                description: document.getElementById('hackathon-description').value,
+                tags: document.getElementById('hackathon-tags').value,
+                createdAt: Timestamp.now()
+            };
+            
+            try {
+                await addDoc(collection(db, "hackathons"), hackathonData);
+                alert("Hackathon added successfully!");
+                e.target.reset();
+                showSection('hackathons');
+            } catch (error) {
+                console.error("Error adding hackathon: ", error);
+                alert("Error adding hackathon. Check console.");
+            }
+        });
+
+        async function loadHackathons() {
+            hackathonsList.innerHTML = '<div class="text-center text-gray-500 col-span-full py-12">Loading Hackathons...</div>';
+            const q = query(collection(db, "hackathons"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            hackathonsList.innerHTML = '';
+            if (querySnapshot.empty) {
+                hackathonsList.innerHTML = `<p class="text-center text-gray-500 col-span-full py-16">No hackathons available to manage.</p>`;
+                return;
+            }
+            
+            querySnapshot.forEach((docSnap) => {
+                const event = docSnap.data();
+                const tags = event.tags ? event.tags.split(',')[0].trim() : 'Event';
+                
+                hackathonsList.innerHTML += `
+                    <div class="card-admin rounded-2xl p-6 flex flex-col border border-purple-200 hover:shadow-xl transition">
+                        <h3 class="text-xl font-bold text-purple-800 mb-2">${event.name}</h3>
+                        <p class="text-sm text-gray-600 mb-1">Duration: ${event.duration || 'TBD'}</p>
+                        <p class="text-xs text-gray-500 mb-3">Location: ${event.location || 'N/A'}</p>
+                        <p class="text-gray-700 flex-grow mb-4 text-sm">${event.description.slice(0, 100)}...</p>
+                        <p class="text-xs text-indigo-600 mb-4 font-semibold">Tags: ${tags}</p>
+                        <div class="flex justify-between items-center gap-4 mt-auto">
+                            <a href="${event.link}" target="_blank" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 font-semibold transition text-sm flex-grow text-center">View Link</a>
+                            <button onclick="deleteHackathon('${docSnap.id}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 font-semibold transition text-sm">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.deleteHackathon = async (id) => {
+            if (confirm("Are you sure you want to delete this hackathon event?")) {
+                await deleteDoc(doc(db, "hackathons", id));
+                loadHackathons();
+            }
+        };
+        
+        // Initialize Load - Authentication check handles the initial view logic.
+    </script>
 </body>
 </html>
